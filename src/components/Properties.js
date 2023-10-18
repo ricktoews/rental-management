@@ -1,27 +1,51 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getProperties } from '../utils/apis';
+import styled from 'styled-components';
+
+const PropertyButton = styled.div`
+  cursor: pointer;
+  background-color: purple;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px; // Rounded ends
+  margin: 10px 0; // Vertical spacing between buttons
+
+  // Optional: Add hover effect for better UX
+  &:hover {
+    background-color: darkviolet;
+  }
+`;
 
 const Properties = () => {
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  // ... other states
+  const [properties, setProperties] = useState([]);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const property = { address, city /* ... other fields */ };
-    await axios.post('/api/properties', property);
-    // handle response, error, and clear form or navigate, etc.
+  useEffect(() => {
+    getProperties()
+    .then(res => {
+      setProperties(res);
+    })
+  }, []);
+
+  const handleClick = (event) => {
+    const propertyId = event.currentTarget.getAttribute('data-id');
+    navigate(`/property/edit/${propertyId}`);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" />
-      <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
-      {/* ... other input fields */}
-      <button type="submit">Add Property</button>
-    </form>
+    <div className="property-list">
+      {properties.map(property => (
+        <PropertyButton 
+          key={property.property_id}
+          data-id={property.property_id}
+          onClick={handleClick}
+        >
+          {property.address}
+        </PropertyButton>
+      ))}
+    </div>
   );
 };
 
 export default Properties;
-
