@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails } from '../utils/apis';
+import { format$ } from '../utils/helpers';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -26,6 +27,10 @@ const RentInput = styled(StyledInput)`
     width: 100px;
 `;
 
+const Money = styled.td`
+text-align: right;
+`;
+
 const PropertyTable = styled.table`
     margin-bottom: 20px;
 `;
@@ -36,6 +41,8 @@ function PropertyEdit() {
     const [propertyFees, setPropertyFees] = useState({});
     const [units, setUnits] = useState([]);
     const [triggerSave, setTriggerSave] = useState(false);
+    let propertyMonthlyTotal = 0;
+    let columns;
 
     useEffect(() => {
         if (propertyId) {
@@ -50,7 +57,6 @@ function PropertyEdit() {
 
     useEffect(() => {
         if (triggerSave) {
-            console.log('====> Save property fees', propertyId, propertyFees);
             const detailsData = { monthly_fees: propertyFees };
             savePropertyDetails(propertyId, detailsData);
             setTriggerSave(false);
@@ -99,35 +105,42 @@ function PropertyEdit() {
             <table border="1">
                 <thead>
                     <tr>
-                        <th>Unit</th>
-                        <th>Tenant</th>
-                        <th>Rent</th>
-                        { hasFee('scep') && <th>SCEP</th> }
-                        { hasFee('rfd') && <th>RFD</th> }
-                        { hasFee('trash') && <th>Trash</th> }
-                        { hasFee('parking') && <th>Parking</th> }
-                        <th>Monthly Total</th>
+                        <CenteredTh>Unit</CenteredTh>
+                        <CenteredTh>Tenant</CenteredTh>
+                        <CenteredTh>Rent</CenteredTh>
+                        { hasFee('scep') && <CenteredTh>SCEP</CenteredTh> }
+                        { hasFee('rfd') && <CenteredTh>RFD</CenteredTh> }
+                        { hasFee('trash') && <CenteredTh>Trash</CenteredTh> }
+                        { hasFee('parking') && <CenteredTh>Parking</CenteredTh> }
+                        <CenteredTh>Monthly Total</CenteredTh>
                     </tr>
                 </thead>
                 <tbody>
                     {units.map((unit, idx) => {
+                        columns = 3;
                         let monthlyTotal = unit.rent_amount;
-                        if (hasFee('scep')) monthlyTotal += propertyFees.scep;
-                        if (hasFee('rfd')) monthlyTotal += propertyFees.rfd;
-                        if (hasFee('trash')) monthlyTotal += propertyFees.trash;
-                        if (hasFee('parking')) monthlyTotal += propertyFees.parking;
+                        if (hasFee('scep')) {monthlyTotal += propertyFees.scep; columns++;}
+                        if (hasFee('rfd')) {monthlyTotal += propertyFees.rfd; columns++;}
+                        if (hasFee('trash')) {monthlyTotal += propertyFees.trash; columns++;}
+                        if (hasFee('parking')) {monthlyTotal += propertyFees.parking; columns++;}
+
+                        propertyMonthlyTotal += monthlyTotal;
                         return (
                         <tr key={idx}>
                             <td>{unit.unit_number}</td>
                             <td>{unit.first_name} {unit.last_name}</td>
-                            <td>${unit.rent_amount}</td>
-                            { hasFee('scep') && <td>${propertyFees.scep}</td> }
-                            { hasFee('rfd') && <td>${propertyFees.rfd}</td> }
-                            { hasFee('trash') && <td>${propertyFees.trash}</td> }
-                            { hasFee('parking') && <td>${propertyFees.parking}</td> }
-                            <td>${monthlyTotal.toFixed(2)}</td>
+                            <Money>{format$(unit.rent_amount)}</Money>
+                            { hasFee('scep') && <Money>{format$(propertyFees.scep)}</Money> }
+                            { hasFee('rfd') && <Money>{format$(propertyFees.rfd)}</Money> }
+                            { hasFee('trash') && <Money>{format$(propertyFees.trash)}</Money> }
+                            { hasFee('parking') && <Money>{format$(propertyFees.parking)}</Money> }
+                            <Money>{format$(monthlyTotal)}</Money>
                         </tr>
                     )})}
+                    <tr>
+                        <td colSpan={columns} style={{textAlign: 'right'}}>Property Total:</td>
+                        <Money>{format$(propertyMonthlyTotal)}</Money>
+                    </tr>
                 </tbody>
             </table>
         </div>
