@@ -90,7 +90,6 @@ function PropertyEdit() {
                     });
                 })
                 setFeeCharged(_feeCharged);
-                console.log('====> feeCharged', _feeCharged);
             })
         }
     }, [propertyId]);
@@ -156,8 +155,10 @@ function PropertyEdit() {
                     }
                 }
             });
+            const unit_record = units.find(unit => unit.unit_id === unit_id);
+            unit_record.unit_fees = monthly_fees;
             const payload = { rent_amount, monthly_fees };
-            console.log('====> monthly_fees', payload);
+            setUnits([...units]);
             saveUnitMonthlyFees(unit_id, payload);
         }
     }
@@ -275,6 +276,7 @@ function PropertyEdit() {
                         propertyMonthlyTotal += monthlyTotal;
                         if (check_number) {
                             check_amount = tenantPaymentData.check_amount;
+                            console.log('====> check', check_number, check_amount);
                             check_date = tenantPaymentData.check_date;
                             paymentsReceivedTotal += parseFloat(check_amount);
                         }
@@ -295,16 +297,16 @@ function PropertyEdit() {
                             </tr>
                             <tr data-tenant_id={tenant_id}>
                                 <td></td>
-                                <td><input data-monthly="rent" onBlur={handlePayment} defaultValue={unit.rent_amount} /></td>
-                                { feeCharged.scep && <td><input data-monthly='scep' onBlur={handlePayment} defaultValue={scep} /></td>}
-                                { feeCharged.rfd && <td><input data-monthly='rfd' onBlur={handlePayment} defaultValue={rfd} /></td> }
-                                { feeCharged.trash && <td><input data-monthly='trash' onBlur={handlePayment} defaultValue={trash} /></td> }
-                                { feeCharged.parking && <td><input data-monthly='parking' onBlur={handlePayment} defaultValue={parking} /></td> }
+                                <td><input data-monthly="rent" onBlur={handlePayment} value={unit.rent_amount} /></td>
+                                { feeCharged.scep && <td><input data-monthly='scep' onBlur={handlePayment} value={scep} /></td>}
+                                { feeCharged.rfd && <td><input data-monthly='rfd' onBlur={handlePayment} value={rfd} /></td> }
+                                { feeCharged.trash && <td><input data-monthly='trash' onBlur={handlePayment} value={trash} /></td> }
+                                { feeCharged.parking && <td><input data-monthly='parking' onBlur={handlePayment} value={parking} /></td> }
                                 <td></td>
                                 <td style={{textAlign: 'right'}}>Payment this month:</td>
-                                <td><CheckNoInput data-check="number" onBlur={handlePayment} defaultValue={check_number} /></td>
-                                <td><PaymentInput data-check="amount" onBlur={handlePayment} defaultValue={monthlyTotal} /></td>
-                                <td><CheckDateInput data-check="date" onBlur={handlePayment} defaultValue={check_date} /></td>
+                                <td><CheckNoInput data-check="number" onBlur={handlePayment} value={check_number} /></td>
+                                <td><PaymentInput data-check="amount" onBlur={handlePayment} value={check_amount} /></td>
+                                <td><CheckDateInput data-check="date" onBlur={handlePayment} value={check_date} /></td>
                             </tr>
                         </React.Fragment>
                     )})}
