@@ -52,3 +52,70 @@ export const savePropertyDetails = async (propertyId, details) => {
         throw error; // Re-throwing the error to allow handling it at the call site
     }
 };
+
+export const saveUnitMonthlyFees = async (unit_id, payload) => {
+    try {
+        const response = await fetch(REST.saveUnitMonthly + unit_id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
+export const setPayment = async (payload) => {
+    try {
+        const response = await fetch(REST.setPayment, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
+export const getPayments = async (payment_month, tenant_ids) => {
+    const payload = { payment_month, tenant_ids };
+    try {
+        const response = await fetch(REST.getPayments, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}

@@ -55,29 +55,6 @@ h1 {
   position: relative;
 }
 
-.shelf-selector {
-  display: flex;
-  justify-content: center;
-}
-
-.shelf-on {
-  background-color: #666;
-}
-
-.shelf-off {
-  background-color: #999;
-}
-
-.book-list {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.book-item {
-  margin: 10px;
-  cursor: pointer;
-}
-
 .app-content {
   padding-top: 75px;
 }
@@ -169,505 +146,51 @@ header {
   color: white;
 }
 
-.year-search {
-  position: fixed;
-  right: 50px;
-  bottom: 50px;
-}
-
-.year-search-show {
-  opacity: 1;
-}
-
-.year-search-hide {
-  opacity: 0;
-}
-
-.year-search input {
-  width: 50px;
-  border: 1px solid gray;
-  border-radius: 10px;
-}
-
-
-.app-btn {
-  background-color: #999;
-  border: none;
-}
-
-.app-btn:hover {
-  background-color: #ccc;
-}
-
-.app-btn:focus {
-  background-color: #ccc;
-}
-
-
 h2 {
   margin-top: var(--spacing-above);
 }
 
-.year-12-digit-wrapper {
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding: 3px;
-  cursor: pointer;
+table.property-fees {
+  width: auto;
 }
 
-.weird-year {
-  background: rgb(145, 200, 145);
+.month-selector {
+  margin-bottom: 20px;
 }
 
-.current-year {
-  background-color: #ddd;
+table.unit-payments tr:nth-child(even) {
+  border-bottom: 2px solid green;
 }
 
-.century-divider {
-  flex-basis: 100%;
-  height: 0;
-}
-
-.calendar-grid {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.digit-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 10px);
-}
-
-.year-label {
-  font-size: 10px;
-  font-weight: bold;
-  grid-column: 1/-1;
-}
-
-.digit-grid>div {
-  font-size: 10px;
-}
-
-.matching-cols {
-  display: flex;
-}
-
-h4 {
-  font-size: 12pt;
-}
-
-thead tr {
-  background-color: var(--palette-4);
-  color: white;
-}
-
-td {
-  padding: 0 10px;
-}
-
-
-.numerator-list span {
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  font-size: 1rem;
-  margin: 8px;
-  background-color: var(--palette-3);
-  border-radius: 20px;
-}
-
-.numerator-list span {
-  display: inline-block;
-  text-align: center;
-  cursor: pointer;
-  color: #fff;
-}
-
-.first-half {
-  color: var(--palette-2);
-}
-
-.second-half {
-  color: var(--palette-3);
-}
-
-.uncomplementary {
-  color: var(--palette-4);
-}
-
-.digits,
-.period {
-  word-break: break-all;
-}
-
-
-/* This belongs to the Digit component */
-.digit {
-  margin-right: 10px;
-  width: 30px;
-  height: 30px;
-  background: rgb(145, 200, 145);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.digit-pad {
-  display: flex;
-}
-
-/* For the Calendar Lab */
-.calendar-completion {
-  font-size: 1rem;
-
-  th,
-  td {
-    border-radius: 10px;
-  }
-
-  thead th {
-    text-align: center;
-  }
-
-  tbody th {
-    font-size: .6rem;
-    text-align: center;
-  }
-
-  tbody td {
-    text-align: center;
-  }
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  /* First column auto-sized, second column takes remaining space */
-  grid-template-rows: auto auto;
-  /* Two rows with auto-sizing */
-  gap: 10px;
-  /* Adjust the gap between cells as needed */
-}
-
-.grid-item {
-  border: 1px solid #ccc;
-  /* Add a border for cell separation */
-  padding: 10px;
-  /* Add padding for spacing within cells */
-}
-
-.grid-container>div {
-  display: flex;
-  align-items: center;
-}
-
-.grid-container .align-top {
-  display: flex;
-  align-items: start;
-}
-
-.step-number {
-  margin-right: 10px;
-  background: rgb(209, 25, 246);
-  color: white;
-  border-radius: 10px;
-  font-size: .75rem;
-  padding: 0 7px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-section .calculation {
-  display: flex;
-  align-items: center;
-}
-
-.hide-answer {
-  opacity: 0;
-}
-
-.large-number {
-  width: 50px;
-  height: 50px;
-  background: rgb(145, 200, 145);
-  font-size: 1.75rem;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.arithmetic-op {
-  width: 36px;
-  height: 36px;
-  background: rgb(145, 200, 145);
-  font-size: 1.75rem;
-  margin: 0 5px;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-section .calculation input {
-  margin-left: 10px;
-  outline: none;
-}
-
-.calendar-lab {
-  display: inline-block;
-  max-width: 100%;
-  margin-bottom: var(--spacing-below);
-}
-
-.calendar-lab button {
+table.unit-payments tr[data-unit_id] input {
+  background-color: #a7b9b1;
+  border-radius: 4px;
+  margin: 4px 0;
   border: none;
-  font-size: 1.5rem;
-  background: var(--palette-4);
-  color: white;
-  border-radius: 20px;
-  margin: 0 5px;
-
-}
-
-.calendar-lab .button-wrapper {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-/* INSTRUCTIONS */
-.month-offsets {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: var(--spacing-below);
-}
-
-.month-offsets-table th {
-  text-align: center;
-  background: black;
-  color: white;
-}
-
-.month-grid {
-  display: inline-grid;
-  grid-template-columns: repeat(7, auto);
-  border: 1px solid var(--palette-grey-1);
-  border-radius: 5px;
-}
-
-.month-grid>div:not(.month-heading):not(.weekday-label) {
-  position: relative;
-  border: 1px solid #eee;
   width: 50px;
-  height: 45px;
-  padding-right: 4px;
   text-align: right;
 }
 
-.month-table td {
-  position: relative;
-  border: 1px solid #eee;
+table.unit-payments tr[data-tenant_id] input[data-monthly] {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin: 4px 0;
   width: 50px;
-  height: 45px;
-  padding-right: 4px;
   text-align: right;
 }
 
-.month-grid>div:not(.month-heading):not(.weekday-label):not(.month-offset) {
-  cursor: pointer;
+table.unit-payments tr[data-unit_id] input[data-monthly="rent"],
+table.unit-payments tr[data-tenant_id] input[data-monthly="rent"]
+ {
+  width: 100px;
 }
 
-.month-grid>.weekday-label {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: .75em;
-  text-align: center;
-  background: var(--palette-4);
-}
-
-.month-table th.weekday-label {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: .75em;
-  text-align: center;
-  background: #000;
-}
-
-.month-grid>.month-heading {
-  grid-column: 1 / 8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.month-table th.month-heading {
-  text-align: center;
-  background: black;
-}
-
-.month-grid .selected-weekday {
-  background-color: var(--palette-3);
-}
-
-.selected-date {
-  background-color: var(--palette-grey-4);
-}
-
-/*
-.month-grid.weekly-cycles>div {
-  font-size: 1em;
-}
-*/
-
-.month-grid .offset-overlay {
+table.unit-payments tr input[data-monthly]::before {
+  content: "$"; /* The dollar sign character */
   position: absolute;
-  z-index: 10;
-  height: 45px;
-  background: rgba(128, 128, 128, .4);
-  color: white;
-  display: flex;
-  justify-Content: center;
-  align-items: center;
-}
-
-.month-grid.weekly-cycles div.offset-overlay {
-  display: none;
-}
-
-.month-grid.weekly-cycles>div::after {
-  content: attr(data-ndx);
-  position: absolute;
-  width: 25px;
-  height: 25px;
-  top: 2px;
-  right: 2px;
-  background-color: var(--palette-3);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-}
-
-.weekly-cycle-grid {
-  display: inline-grid;
-  grid-template-columns: repeat(7, auto);
-  border: 1px solid var(--palette-grey-1);
-  border-radius: 5px;
-  margin-bottom: var(--spacing-below);
-  cursor: pointer;
-}
-
-.weekly-cycle-grid>div:not(.weekday-label) {
-  border: 1px solid #eee;
-  width: 50px;
-  height: 45px;
-  padding-right: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.weekly-cycle-table td {
-  border: 1px solid #eee;
-  width: 50px;
-  height: 45px;
-  padding-right: 4px;
-  text-align: center;
-}
-
-.weekly-cycle-grid>div>span {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  background-color: rgb(209, 25, 246);
-  border-radius: 50%;
-  color: white;
-  opacity: 1;
-}
-
-.weekly-cycle-grid>div.fade {
-  opacity: 0;
-  transition: opacity .5s;
-}
-
-.weekly-cycle-grid>.weekday-label {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: .75em;
-  text-align: center;
-  background: var(--palette-4);
-}
-
-.weekly-cycle-table th.weekday-label {
-  height: 20px;
-  width: 50px;
-  color: white;
-  font-size: .75em;
-  text-align: center;
-  background: #000;
-}
-
-.weekly-cycle-grid>.weekday-label.matched-day {
-  background: var(--palette-3);
-}
-
-.year-example {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.leap-year-illustration {
-  display: inline-grid;
-  grid-template-columns: repeat(4, auto);
-  border: 1px solid var(--palette-grey-1);
-  border-radius: 5px;
-}
-
-.leap-year-illustration>div {
-  position: relative;
-  border: 1px solid #eee;
-  width: 50px;
-  height: 45px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.leap-year-illustration>div:nth-child(4n) {
-  background-color: var(--palette-4);
-}
-
-.leap-year-illustration>div:nth-child(4n)::after {
-  content: attr(data-ndx);
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  bottom: 2px;
-  right: 2px;
-  background-color: var(--palette-2);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
+  left: 5px; /* Adjust the left position as needed */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Center vertically */
+  color: #000; /* Text color */
+  font-weight: bold; /* Adjust font styles as needed */
 }

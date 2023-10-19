@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+// Import Bootstrap CSS if you haven't already
+
 import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { getPropertyById, savePropertyDetails } from '../utils/apis';
-import { format$ } from '../utils/helpers';
+import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
+import { format$, getFirstDayOfNextMonth } from '../utils/helpers';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -23,9 +25,19 @@ const UnitInput = styled(StyledInput)`
     width: 75px;
 `;
 
-const RentInput = styled(StyledInput)`
+const PaymentInput = styled(StyledInput)`
+    width: 100px;
+    text-align: right;
+`;
+
+const CheckNoInput = styled(StyledInput)`
+    width: 75px;
+`;
+
+const CheckDateInput = styled(StyledInput)`
     width: 100px;
 `;
+
 
 const Money = styled.td`
 text-align: right;
@@ -35,13 +47,24 @@ const PropertyTable = styled.table`
     margin-bottom: 20px;
 `;
 
+const StyledLabel = styled.label`
+  margin-right: 10px;
+`;
+
+
 function PropertyEdit() {
     let { propertyId } = useParams();
+    const nextMonth = (new Date().getMonth() + 2) % 12;
     const [address, setAddress] = useState('');
+    const [paymentMonth, setPaymentMonth] = useState(nextMonth);
+    const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
     const [propertyFees, setPropertyFees] = useState({});
+    const [feeCharged, setFeeCharged] = useState({});
     const [units, setUnits] = useState([]);
+    const [paymentData, setPaymentData] = useState([]);
+    const [totals, setTotals] = useState({});
     const [triggerSave, setTriggerSave] = useState(false);
-    let propertyMonthlyTotal = 0;
+    let propertyMonthlyTotal = 0, paymentsReceivedTotal = 0;
     let columns;
 
     useEffect(() => {
@@ -51,6 +74,23 @@ function PropertyEdit() {
                 setAddress(res.property_address);
                 setPropertyFees(res.property_fees || {});
                 setUnits(res.units);
+                
+                const _feeCharged = {};
+                Object.keys(res.property_fees).forEach(item => {
+                    if (res.property_fees[item]) {
+                        _feeCharged[item] = true;
+                    }
+                });
+                const unitFeesArray = res.units.filter(item=>item.unit_fees).map(item=>item.unit_fees);
+                unitFeesArray.forEach(unitFees => {
+                    Object.keys(unitFees).forEach(item => {
+                        if (unitFees[item]) {
+                            _feeCharged[item] = true;
+                        }
+                    });
+                })
+                setFeeCharged(_feeCharged);
+                console.log('====> feeCharged', _feeCharged);
             })
         }
     }, [propertyId]);
@@ -63,6 +103,29 @@ function PropertyEdit() {
         }
     }, [triggerSave]);
 
+    useEffect(() => {
+        const tenantIds = units.map(item => item.tenant_id);
+        if (tenantIds.length > 0) {
+            getPayments(paymentMonth, tenantIds)
+            .then(res => {
+                setPaymentData(res);
+            });
+        }
+    }, [paymentMonth, units])
+
+    const generateMonthOptions = () => {
+        const months = [
+            'January', 'February', 'March', 'April',
+            'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December'
+        ];
+    
+        // Generate options starting from the next month
+        return months.map((month, index) => {
+            return <option key={index} value={index + 1}>{month}</option>;
+        });
+    };
+    
     const hasFee = (feeType) => {
         return propertyFees[feeType] > 0;
     }
@@ -75,6 +138,63 @@ function PropertyEdit() {
         setTriggerSave(true);
     }
 
+    const handleUnitFees = e => {
+        const el = e.currentTarget;
+        const parentTr = el.closest('tr');
+        if (parentTr) {
+            const unit_id = parseInt(parentTr.dataset.unit_id, 10);
+            const inputEls = Array.from(parentTr.querySelectorAll('input'));
+            const monthly_fees = {};
+            let rent_amount;
+            inputEls.forEach(item => {
+                const data = item.dataset;
+                if (data.monthly) {
+                    if (data.monthly === 'rent') {
+                        rent_amount = parseFloat(item.value);
+                    } else {
+                        monthly_fees[data.monthly] = parseFloat(item.value);
+                    }
+                }
+            });
+            const payload = { rent_amount, monthly_fees };
+            console.log('====> monthly_fees', payload);
+            saveUnitMonthlyFees(unit_id, payload);
+        }
+    }
+
+    const handlePayment = e => {
+        const el = e.currentTarget;
+        const parentTr = el.closest('tr');
+        if (parentTr) {
+            const tenant_id = parentTr.dataset.tenant_id;
+            const inputEls = Array.from(parentTr.querySelectorAll('input'));
+            const disbursement = {};
+            let check_number, check_date, check_amount;
+            inputEls.forEach(item => {
+                const data = item.dataset;
+                if (data.monthly) {
+                    disbursement[data.monthly] = parseFloat(item.value);
+                }
+                else if (data.check) {
+                    if (data.check === 'number') {
+                        check_number = item.value;
+                    }
+                    else if (data.check === 'date') {
+                        check_date = item.value;
+                    }
+                    else if (data.check === 'amount') {
+                        check_amount = item.value;
+                    }
+                }
+            });
+            if (check_number) {
+                const payload = { tenant_id, payment_month: paymentMonth, check_number, check_amount, check_date, disbursement };
+                setPayment(payload);
+            }
+        }
+    
+    }
+
     return (
         <div>
             <Link to="/">Return to Property List</Link>
@@ -82,9 +202,9 @@ function PropertyEdit() {
             <h2>{address}</h2>
 
             {/* Property Fees Table */}
-            <PropertyTable border="1">
+            <PropertyTable className="property-fees table">
                 <thead>
-                    <tr>
+                    <tr className="table-success">
                         <CenteredTh>SCEP</CenteredTh>
                         <CenteredTh>RFD</CenteredTh>
                         <CenteredTh>Trash</CenteredTh>
@@ -101,45 +221,100 @@ function PropertyEdit() {
                 </tbody>
             </PropertyTable>
 
+            {/* Payment Month Dropdown */}
+            <div className="month-selector">
+                <label htmlFor="paymentMonth">Payment Month:</label>
+                <select
+                    id="paymentMonth"
+                    value={paymentMonth}
+                    onChange={(e) => setPaymentMonth(e.target.value)}
+                >
+                    {generateMonthOptions()}
+                </select>
+            </div>
+
             {/* Units Table */}
-            <table border="1">
+            <table className="unit-payments table table-striped">
                 <thead>
-                    <tr>
+                    <tr className="table-success">
                         <CenteredTh>Unit</CenteredTh>
-                        <CenteredTh>Tenant</CenteredTh>
                         <CenteredTh>Rent</CenteredTh>
-                        { hasFee('scep') && <CenteredTh>SCEP</CenteredTh> }
-                        { hasFee('rfd') && <CenteredTh>RFD</CenteredTh> }
-                        { hasFee('trash') && <CenteredTh>Trash</CenteredTh> }
-                        { hasFee('parking') && <CenteredTh>Parking</CenteredTh> }
+                        { feeCharged.scep && <CenteredTh>SCEP</CenteredTh> }
+                        { feeCharged.rfd && <CenteredTh>RFD</CenteredTh> }
+                        { feeCharged.trash && <CenteredTh>Trash</CenteredTh> }
+                        { feeCharged.parking && <CenteredTh>Parking</CenteredTh> }
                         <CenteredTh>Monthly Total</CenteredTh>
+                        <CenteredTh>Tenant</CenteredTh>
+                        <CenteredTh>Check Number</CenteredTh>
+                        <CenteredTh>Check Amount</CenteredTh>
+                        <CenteredTh>Check Date</CenteredTh>
                     </tr>
                 </thead>
                 <tbody>
                     {units.map((unit, idx) => {
-                        columns = 3;
+                        columns = 2;
+                        const tenant_id = unit.tenant_id;
+                        const tenantPaymentData = paymentData.find(item => item.tenant_id == tenant_id);
+                        let { scep = null, rfd = null, trash = null, parking = null } = propertyFees;
                         let monthlyTotal = unit.rent_amount;
-                        if (hasFee('scep')) {monthlyTotal += propertyFees.scep; columns++;}
-                        if (hasFee('rfd')) {monthlyTotal += propertyFees.rfd; columns++;}
-                        if (hasFee('trash')) {monthlyTotal += propertyFees.trash; columns++;}
-                        if (hasFee('parking')) {monthlyTotal += propertyFees.parking; columns++;}
+                        const fees = unit.unit_fees;
+                        if (fees) {
+                            if (fees.scep) scep = fees.scep;
+                            if (fees.rfd) rfd = fees.rfd;
+                            if (fees.trash) trash = fees.trash;
+                            if (fees.parking) parking = fees.parking;
+                        }
+                        let check_number = tenantPaymentData ? tenantPaymentData.check_number : '';
+                        let check_amount = monthlyTotal;
+                        let check_date = defaultCheckDate;
+                        if (scep) {monthlyTotal += scep; columns++;}
+                        if (rfd) {monthlyTotal += rfd; columns++;}
+                        if (trash) {monthlyTotal += trash; columns++;}
+                        if (parking) {monthlyTotal += parking; columns++;}
 
                         propertyMonthlyTotal += monthlyTotal;
-                        return (
-                        <tr key={idx}>
-                            <td>{unit.unit_number}</td>
-                            <td>{unit.first_name} {unit.last_name}</td>
-                            <Money>{format$(unit.rent_amount)}</Money>
-                            { hasFee('scep') && <Money>{format$(propertyFees.scep)}</Money> }
-                            { hasFee('rfd') && <Money>{format$(propertyFees.rfd)}</Money> }
-                            { hasFee('trash') && <Money>{format$(propertyFees.trash)}</Money> }
-                            { hasFee('parking') && <Money>{format$(propertyFees.parking)}</Money> }
-                            <Money>{format$(monthlyTotal)}</Money>
-                        </tr>
+                        if (check_number) {
+                            check_amount = tenantPaymentData.check_amount;
+                            check_date = tenantPaymentData.check_date;
+                            paymentsReceivedTotal += parseFloat(check_amount);
+                        }
+
+                        return (<React.Fragment key={idx}>
+                            <tr data-unit_id={unit.unit_id}>
+                                <td>{unit.unit_number}</td>
+                                <td><input data-monthly="rent" onBlur={handleUnitFees} defaultValue={unit.rent_amount} /></td>
+                                { feeCharged.scep && <td><input data-monthly="scep" onBlur={handleUnitFees} defaultValue={scep} /></td> }
+                                { feeCharged.rfd && <td><input data-monthly="rfd" onBlur={handleUnitFees} defaultValue={rfd} /></td> }
+                                { feeCharged.trash && <td><input data-monthly="trash" onBlur={handleUnitFees} defaultValue={trash} /></td> }
+                                { feeCharged.parking && <td><input data-monthly="parking" onBlur={handleUnitFees} defaultValue={parking} /></td> }
+                                <Money>{format$(monthlyTotal)}</Money>
+                                <td>{unit.first_name} {unit.last_name}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr data-tenant_id={tenant_id}>
+                                <td></td>
+                                <td><input data-monthly="rent" onBlur={handlePayment} defaultValue={unit.rent_amount} /></td>
+                                { feeCharged.scep && <td><input data-monthly='scep' onBlur={handlePayment} defaultValue={scep} /></td>}
+                                { feeCharged.rfd && <td><input data-monthly='rfd' onBlur={handlePayment} defaultValue={rfd} /></td> }
+                                { feeCharged.trash && <td><input data-monthly='trash' onBlur={handlePayment} defaultValue={trash} /></td> }
+                                { feeCharged.parking && <td><input data-monthly='parking' onBlur={handlePayment} defaultValue={parking} /></td> }
+                                <td></td>
+                                <td style={{textAlign: 'right'}}>Payment this month:</td>
+                                <td><CheckNoInput data-check="number" onBlur={handlePayment} defaultValue={check_number} /></td>
+                                <td><PaymentInput data-check="amount" onBlur={handlePayment} defaultValue={monthlyTotal} /></td>
+                                <td><CheckDateInput data-check="date" onBlur={handlePayment} defaultValue={check_date} /></td>
+                            </tr>
+                        </React.Fragment>
                     )})}
                     <tr>
                         <td colSpan={columns} style={{textAlign: 'right'}}>Property Total:</td>
                         <Money>{format$(propertyMonthlyTotal)}</Money>
+                        <td></td>
+                        <td style={{textAlign: 'right'}}>Received:</td>
+                        <Money>{format$(paymentsReceivedTotal)}</Money>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
