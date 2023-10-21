@@ -70,27 +70,27 @@ function PropertyEdit() {
     useEffect(() => {
         if (propertyId) {
             getPropertyById(propertyId)
-            .then(res => {
-                setAddress(res.property_address);
-                setPropertyFees(res.property_fees || {});
-                setUnits(res.units);
-                
-                const _feeCharged = {};
-                Object.keys(res.property_fees).forEach(item => {
-                    if (res.property_fees[item]) {
-                        _feeCharged[item] = true;
-                    }
-                });
-                const unitFeesArray = res.units.filter(item=>item.unit_fees).map(item=>item.unit_fees);
-                unitFeesArray.forEach(unitFees => {
-                    Object.keys(unitFees).forEach(item => {
-                        if (unitFees[item]) {
+                .then(res => {
+                    setAddress(res.property_address);
+                    setPropertyFees(res.property_fees || {});
+                    setUnits(res.units);
+
+                    const _feeCharged = {};
+                    Object.keys(res.property_fees).forEach(item => {
+                        if (res.property_fees[item]) {
                             _feeCharged[item] = true;
                         }
                     });
+                    const unitFeesArray = res.units.filter(item => item.unit_fees).map(item => item.unit_fees);
+                    unitFeesArray.forEach(unitFees => {
+                        Object.keys(unitFees).forEach(item => {
+                            if (unitFees[item]) {
+                                _feeCharged[item] = true;
+                            }
+                        });
+                    })
+                    setFeeCharged(_feeCharged);
                 })
-                setFeeCharged(_feeCharged);
-            })
         }
     }, [propertyId]);
 
@@ -106,9 +106,9 @@ function PropertyEdit() {
         const tenantIds = units.map(item => item.tenant_id);
         if (tenantIds.length > 0) {
             getPayments(paymentMonth, tenantIds)
-            .then(res => {
-                setPaymentData(res);
-            });
+                .then(res => {
+                    setPaymentData(res);
+                });
         }
     }, [paymentMonth, units])
 
@@ -118,18 +118,18 @@ function PropertyEdit() {
             'May', 'June', 'July', 'August',
             'September', 'October', 'November', 'December'
         ];
-    
+
         // Generate options starting from the next month
         return months.map((month, index) => {
             return <option key={index} value={index + 1}>{month}</option>;
         });
     };
-    
+
     const handleFeeChange = e => {
         const field = e.currentTarget;
         const feeProperty = field.dataset.fee;
-        const value = 1*field.value || 0;
-        setPropertyFees({...propertyFees, [feeProperty]: value});
+        const value = 1 * field.value || 0;
+        setPropertyFees({ ...propertyFees, [feeProperty]: value });
         setTriggerSave(true);
     }
 
@@ -189,7 +189,7 @@ function PropertyEdit() {
                 setPayment(payload);
             }
         }
-    
+
     }
 
     return (
@@ -236,10 +236,10 @@ function PropertyEdit() {
                     <tr className="table-success">
                         <CenteredTh>Unit</CenteredTh>
                         <CenteredTh>Rent</CenteredTh>
-                        { feeCharged.scep && <CenteredTh>SCEP</CenteredTh> }
-                        { feeCharged.rfd && <CenteredTh>RFD</CenteredTh> }
-                        { feeCharged.trash && <CenteredTh>Trash</CenteredTh> }
-                        { feeCharged.parking && <CenteredTh>Parking</CenteredTh> }
+                        {feeCharged.scep && <CenteredTh>SCEP</CenteredTh>}
+                        {feeCharged.rfd && <CenteredTh>RFD</CenteredTh>}
+                        {feeCharged.trash && <CenteredTh>Trash</CenteredTh>}
+                        {feeCharged.parking && <CenteredTh>Parking</CenteredTh>}
                         <CenteredTh>Monthly Total</CenteredTh>
                         <CenteredTh>Tenant</CenteredTh>
                         <CenteredTh>Check Number</CenteredTh>
@@ -264,10 +264,10 @@ function PropertyEdit() {
                         let check_number = tenantPaymentData ? tenantPaymentData.check_number : '';
                         let check_amount = monthlyTotal;
                         let check_date = defaultCheckDate;
-                        if (scep) {monthlyTotal += scep; columns++;}
-                        if (rfd) {monthlyTotal += rfd; columns++;}
-                        if (trash) {monthlyTotal += trash; columns++;}
-                        if (parking) {monthlyTotal += parking; columns++;}
+                        if (scep) { monthlyTotal += scep; columns++; }
+                        if (rfd) { monthlyTotal += rfd; columns++; }
+                        if (trash) { monthlyTotal += trash; columns++; }
+                        if (parking) { monthlyTotal += parking; columns++; }
 
                         propertyMonthlyTotal += monthlyTotal;
                         if (check_number) {
@@ -279,12 +279,12 @@ function PropertyEdit() {
 
                         return (<React.Fragment key={idx}>
                             <tr data-unit_id={unit.unit_id}>
-                                <td>{unit.unit_number}</td>
+                                <td><Link to={`/ledger-card/${unit.unit_id}`}>{unit.unit_number}</Link></td>
                                 <td><input data-monthly="rent" onBlur={handleUnitFees} defaultValue={unit.rent_amount} /></td>
-                                { feeCharged.scep && <td><input data-monthly="scep" onBlur={handleUnitFees} defaultValue={scep} /></td> }
-                                { feeCharged.rfd && <td><input data-monthly="rfd" onBlur={handleUnitFees} defaultValue={rfd} /></td> }
-                                { feeCharged.trash && <td><input data-monthly="trash" onBlur={handleUnitFees} defaultValue={trash} /></td> }
-                                { feeCharged.parking && <td><input data-monthly="parking" onBlur={handleUnitFees} defaultValue={parking} /></td> }
+                                {feeCharged.scep && <td><input data-monthly="scep" onBlur={handleUnitFees} defaultValue={scep} /></td>}
+                                {feeCharged.rfd && <td><input data-monthly="rfd" onBlur={handleUnitFees} defaultValue={rfd} /></td>}
+                                {feeCharged.trash && <td><input data-monthly="trash" onBlur={handleUnitFees} defaultValue={trash} /></td>}
+                                {feeCharged.parking && <td><input data-monthly="parking" onBlur={handleUnitFees} defaultValue={parking} /></td>}
                                 <Money>{format$(monthlyTotal)}</Money>
                                 <td>{unit.first_name} {unit.last_name}</td>
                                 <td></td>
@@ -294,23 +294,24 @@ function PropertyEdit() {
                             <tr data-tenant_id={tenant_id}>
                                 <td></td>
                                 <td><input data-monthly="rent" onChange={handlePayment} value={unit.rent_amount} /></td>
-                                { feeCharged.scep && <td><input data-monthly='scep' onChange={handlePayment} value={scep} /></td>}
-                                { feeCharged.rfd && <td><input data-monthly='rfd' onChange={handlePayment} value={rfd} /></td> }
-                                { feeCharged.trash && <td><input data-monthly='trash' onChange={handlePayment} value={trash} /></td> }
-                                { feeCharged.parking && <td><input data-monthly='parking' onChange={handlePayment} value={parking} /></td> }
+                                {feeCharged.scep && <td><input data-monthly='scep' onChange={handlePayment} value={scep} /></td>}
+                                {feeCharged.rfd && <td><input data-monthly='rfd' onChange={handlePayment} value={rfd} /></td>}
+                                {feeCharged.trash && <td><input data-monthly='trash' onChange={handlePayment} value={trash} /></td>}
+                                {feeCharged.parking && <td><input data-monthly='parking' onChange={handlePayment} value={parking} /></td>}
                                 <td></td>
-                                <td style={{textAlign: 'right'}}>Payment this month:</td>
+                                <td style={{ textAlign: 'right' }}>Payment this month:</td>
                                 <td><CheckNoInput data-check="number" onChange={handlePayment} defaultValue={check_number} /></td>
                                 <td><PaymentInput data-check="amount" onChange={handlePayment} defaultValue={check_amount} /></td>
                                 <td><CheckDateInput data-check="date" onChange={handlePayment} defaultValue={check_date} /></td>
                             </tr>
                         </React.Fragment>
-                    )})}
+                        )
+                    })}
                     <tr>
-                        <td colSpan={columns} style={{textAlign: 'right'}}>Property Total:</td>
+                        <td colSpan={columns} style={{ textAlign: 'right' }}>Property Total:</td>
                         <Money>{format$(propertyMonthlyTotal)}</Money>
                         <td></td>
-                        <td style={{textAlign: 'right'}}>Received:</td>
+                        <td style={{ textAlign: 'right' }}>Received:</td>
                         <Money>{format$(paymentsReceivedTotal)}</Money>
                         <td></td>
                     </tr>
