@@ -125,10 +125,6 @@ function PropertyEdit() {
         });
     };
     
-    const hasFee = (feeType) => {
-        return propertyFees[feeType] > 0;
-    }
-
     const handleFeeChange = e => {
         const field = e.currentTarget;
         const feeProperty = field.dataset.fee;
@@ -297,16 +293,16 @@ function PropertyEdit() {
                             </tr>
                             <tr data-tenant_id={tenant_id}>
                                 <td></td>
-                                <td><input data-monthly="rent" onBlur={handlePayment} value={unit.rent_amount} /></td>
-                                { feeCharged.scep && <td><input data-monthly='scep' onBlur={handlePayment} value={scep} /></td>}
-                                { feeCharged.rfd && <td><input data-monthly='rfd' onBlur={handlePayment} value={rfd} /></td> }
-                                { feeCharged.trash && <td><input data-monthly='trash' onBlur={handlePayment} value={trash} /></td> }
-                                { feeCharged.parking && <td><input data-monthly='parking' onBlur={handlePayment} value={parking} /></td> }
+                                <td><input data-monthly="rent" onChange={handlePayment} value={unit.rent_amount} /></td>
+                                { feeCharged.scep && <td><input data-monthly='scep' onChange={handlePayment} value={scep} /></td>}
+                                { feeCharged.rfd && <td><input data-monthly='rfd' onChange={handlePayment} value={rfd} /></td> }
+                                { feeCharged.trash && <td><input data-monthly='trash' onChange={handlePayment} value={trash} /></td> }
+                                { feeCharged.parking && <td><input data-monthly='parking' onChange={handlePayment} value={parking} /></td> }
                                 <td></td>
                                 <td style={{textAlign: 'right'}}>Payment this month:</td>
-                                <td><CheckNoInput data-check="number" onBlur={handlePayment} value={check_number} /></td>
-                                <td><PaymentInput data-check="amount" onBlur={handlePayment} value={check_amount} /></td>
-                                <td><CheckDateInput data-check="date" onBlur={handlePayment} value={check_date} /></td>
+                                <td><CheckNoInput data-check="number" onChange={handlePayment} defaultValue={check_number} /></td>
+                                <td><PaymentInput data-check="amount" onChange={handlePayment} defaultValue={check_amount} /></td>
+                                <td><CheckDateInput data-check="date" onChange={handlePayment} defaultValue={check_date} /></td>
                             </tr>
                         </React.Fragment>
                     )})}

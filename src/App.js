@@ -6,6 +6,7 @@ import Hamburger from './components/Hamburger';
 import PropertyEdit from './components/PropertyEdit';
 import Properties from './components/Properties';
 import PropertyDropdown from './components/PropertyDropdown';
+import LedgerCard from './components/LedgerCard';
 
 function App() {
   const [menuState, setMenuState] = useState(false);
@@ -92,6 +93,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Properties />} />
           <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
+          <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
           <Route path="/properties" element={<PropertyDropdown />} />
         </Routes>
         </div>

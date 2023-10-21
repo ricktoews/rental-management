@@ -119,3 +119,20 @@ export const getPayments = async (payment_month, tenant_ids) => {
         throw error; // Re-throwing the error to allow handling it at the call site
     }
 }
+
+export const getLedgerCard = async (unit_id) => {
+    try {
+        const response = await fetch(REST.getLedgerCard + unit_id);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+
+}

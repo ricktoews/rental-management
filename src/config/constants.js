@@ -7,4 +7,5 @@ export const REST = {
     saveUnitMonthly: API_BASE + '/unit/monthly/',
     setPayment: API_BASE + '/payment',
     getPayments: API_BASE + '/get-payments',
+    getLedgerCard: API_BASE + '/ledger-card/',
 };
