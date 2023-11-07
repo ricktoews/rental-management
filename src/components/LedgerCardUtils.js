@@ -19,7 +19,7 @@ export const processLedgerData = rows => {
     const disbursementHeadings = getFeeHeadings(rows[0].disbursements);
     const table_data = [];
     rows.forEach(row => {
-        const { property_id, unit_id, rent_amount, first_name, last_name, payment_month, check_number, check_date, check_amount } = row;
+        const { property_id, unit_id, rent_amount, first_name, last_name, ledger_month, check_number, check_date, check_amount } = row;
         const rent_fmt = format$(rent_amount);
         const check_amount_fmt = format$(check_amount);
         const name_fmt = `${first_name} ${last_name}`;
@@ -35,7 +35,7 @@ export const processLedgerData = rows => {
         row_data.total_due = total_due;
         row_data.total_due_fmt = format$(total_due);
         row_data.tenant_name = name_fmt;
-        row_data.payment_month = payment_month;
+        row_data.ledger_month = ledger_month;
         row_data.check_number = check_number;
         row_data.check_date = check_date;
         row_data.paid = check_amount_fmt;

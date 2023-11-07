@@ -158,7 +158,7 @@ table.property-fees {
   margin-bottom: 20px;
 }
 
-table.unit-payments tr:nth-child(even) {
+table.unit-payments tr:nth-child(4n) {
   border-bottom: 2px solid green;
 }
 
@@ -180,17 +180,22 @@ table.unit-payments tr[data-tenant_id] input[data-monthly] {
 }
 
 table.unit-payments tr[data-unit_id] input[data-monthly="rent"],
-table.unit-payments tr[data-tenant_id] input[data-monthly="rent"]
- {
+table.unit-payments tr[data-tenant_id] input[data-monthly="rent"] {
   width: 100px;
 }
 
 table.unit-payments tr input[data-monthly]::before {
-  content: "$"; /* The dollar sign character */
+  content: "$";
+  /* The dollar sign character */
   position: absolute;
-  left: 5px; /* Adjust the left position as needed */
-  top: 50%; /* Center vertically */
-  transform: translateY(-50%); /* Center vertically */
-  color: #000; /* Text color */
-  font-weight: bold; /* Adjust font styles as needed */
+  left: 5px;
+  /* Adjust the left position as needed */
+  top: 50%;
+  /* Center vertically */
+  transform: translateY(-50%);
+  /* Center vertically */
+  color: #000;
+  /* Text color */
+  font-weight: bold;
+  /* Adjust font styles as needed */
 }

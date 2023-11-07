@@ -42,16 +42,16 @@ function LedgerCard() {
                         <th>Rent Amount</th>
                         {Object.keys(ledgerData[0].fees).map(item => <th key={item}>{item.toUpperCase()}</th>)}
                         <th>Total Due</th>
-                        <th>Check Number</th>
+                        <th>Check #</th>
                         <th>Check Date</th>
-                        <th>Paid</th>
+                        <th>Check Amount</th>
                         {Object.keys(ledgerData[0].disbursements).map(item => <th key={item}>{item}</th>)}
                     </tr>
                 </thead>
                 <tbody>
                     {ledgerData.map((entry, key) => (
                         <tr key={key}>
-                            <td>{entry.payment_month}</td>
+                            <td>{entry.ledger_month}</td>
                             <td>{entry.rent}</td>
                             {Object.keys(entry.fees).map(item => <td key={item}>{entry.fees[item]}</td>)}
                             <td>{entry.total_due_fmt}</td>

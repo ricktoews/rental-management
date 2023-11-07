@@ -3,32 +3,32 @@ import { REST } from '../config/constants';
 // Assuming REST is an object with a 'properties' key holding the URL
 export const getProperties = async () => {
     try {
-      const response = await fetch(REST.properties);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
+        const response = await fetch(REST.properties);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
     } catch (error) {
-      console.error("There was a problem fetching the properties:", error);
-      throw error;  // or return some default/fallback data if desired
+        console.error("There was a problem fetching the properties:", error);
+        throw error;  // or return some default/fallback data if desired
     }
-  }
-  
+}
+
 export const getPropertyById = async (id) => {
     const url = REST.propertyById + id;
     try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         return data;
-      } catch (error) {
+    } catch (error) {
         console.error("There was a problem fetching the property:", error);
         throw error;  // or return some default/fallback data if desired
-      }
-  
+    }
+
 };
 
 export const savePropertyDetails = async (propertyId, details) => {
@@ -75,7 +75,7 @@ export const saveUnitMonthlyFees = async (unit_id, payload) => {
     }
 }
 
-export const setPayment = async (payload) => {
+export const saveLedgerEntry = async (payload) => {
     try {
         const response = await fetch(REST.setPayment, {
             method: 'POST',
@@ -97,8 +97,8 @@ export const setPayment = async (payload) => {
     }
 }
 
-export const getPayments = async (payment_month, tenant_ids) => {
-    const payload = { payment_month, tenant_ids };
+export const getPayments = async (ledger_month, tenant_ids) => {
+    const payload = { ledger_month, tenant_ids };
     try {
         const response = await fetch(REST.getPayments, {
             method: 'POST',

@@ -5,6 +5,7 @@ import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
 import { format$, getFirstDayOfNextMonth } from '../utils/helpers';
+import LedgerEntry from './LedgerEntry';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -56,12 +57,12 @@ function PropertyEdit() {
     let { propertyId } = useParams();
     const nextMonth = (new Date().getMonth() + 2) % 12;
     const [address, setAddress] = useState('');
-    const [paymentMonth, setPaymentMonth] = useState(nextMonth);
+    const [ledgerMonth, setledgerMonth] = useState(nextMonth);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
     const [propertyFees, setPropertyFees] = useState({});
     const [feeCharged, setFeeCharged] = useState({});
     const [units, setUnits] = useState([]);
-    const [paymentData, setPaymentData] = useState([]);
+    const [ledgerData, setLedgerData] = useState([]);
     const [totals, setTotals] = useState({});
     const [triggerSave, setTriggerSave] = useState(false);
     let propertyMonthlyTotal = 0, paymentsReceivedTotal = 0;
@@ -105,12 +106,12 @@ function PropertyEdit() {
     useEffect(() => {
         const tenantIds = units.map(item => item.tenant_id);
         if (tenantIds.length > 0) {
-            getPayments(paymentMonth, tenantIds)
+            getPayments(ledgerMonth, tenantIds)
                 .then(res => {
-                    setPaymentData(res);
+                    setLedgerData(res);
                 });
         }
-    }, [paymentMonth, units])
+    }, [ledgerMonth, units])
 
     const generateMonthOptions = () => {
         const months = [
@@ -132,66 +133,67 @@ function PropertyEdit() {
         setPropertyFees({ ...propertyFees, [feeProperty]: value });
         setTriggerSave(true);
     }
-
-    const handleUnitFees = e => {
-        const el = e.currentTarget;
-        const parentTr = el.closest('tr');
-        if (parentTr) {
-            const unit_id = parseInt(parentTr.dataset.unit_id, 10);
-            const inputEls = Array.from(parentTr.querySelectorAll('input'));
-            const monthly_fees = {};
-            let rent_amount;
-            inputEls.forEach(item => {
-                const data = item.dataset;
-                if (data.monthly) {
-                    if (data.monthly === 'rent') {
-                        rent_amount = parseFloat(item.value);
-                    } else {
-                        monthly_fees[data.monthly] = parseFloat(item.value);
+    /*
+        const handleUnitFees = e => {
+            const el = e.currentTarget;
+            const parentTr = el.closest('tr');
+            if (parentTr) {
+                const unit_id = parseInt(parentTr.dataset.unit_id, 10);
+                const inputEls = Array.from(parentTr.querySelectorAll('input'));
+                const monthly_fees = {};
+                let rent_amount;
+                inputEls.forEach(item => {
+                    const data = item.dataset;
+                    if (data.monthly) {
+                        if (data.monthly === 'rent') {
+                            rent_amount = parseFloat(item.value);
+                        } else {
+                            monthly_fees[data.monthly] = parseFloat(item.value);
+                        }
                     }
-                }
-            });
-            const unit_record = units.find(unit => unit.unit_id === unit_id);
-            unit_record.unit_fees = monthly_fees;
-            const payload = { rent_amount, monthly_fees };
-            setUnits([...units]);
-            saveUnitMonthlyFees(unit_id, payload);
-        }
-    }
-
-    const handlePayment = e => {
-        const el = e.currentTarget;
-        const parentTr = el.closest('tr');
-        if (parentTr) {
-            const tenant_id = parentTr.dataset.tenant_id;
-            const inputEls = Array.from(parentTr.querySelectorAll('input'));
-            const disbursement = {};
-            let check_number, check_date, check_amount;
-            inputEls.forEach(item => {
-                const data = item.dataset;
-                if (data.monthly) {
-                    disbursement[data.monthly] = parseFloat(item.value);
-                }
-                else if (data.check) {
-                    if (data.check === 'number') {
-                        check_number = item.value;
-                    }
-                    else if (data.check === 'date') {
-                        check_date = item.value;
-                    }
-                    else if (data.check === 'amount') {
-                        check_amount = item.value;
-                    }
-                }
-            });
-            if (check_number) {
-                const payload = { tenant_id, payment_month: paymentMonth, check_number, check_amount, check_date, disbursement };
-                setPayment(payload);
+                });
+                const unit_record = units.find(unit => unit.unit_id === unit_id);
+                unit_record.unit_fees = monthly_fees;
+                const payload = { rent_amount, monthly_fees };
+                setUnits([...units]);
+                saveUnitMonthlyFees(unit_id, payload);
             }
         }
-
-    }
-
+    */
+    /*
+        const handlePayment = e => {
+            const el = e.currentTarget;
+            const parentTr = el.closest('tr');
+            if (parentTr) {
+                const tenant_id = parentTr.dataset.tenant_id;
+                const inputEls = Array.from(parentTr.querySelectorAll('input'));
+                const disbursement = {};
+                let check_number, check_date, check_amount;
+                inputEls.forEach(item => {
+                    const data = item.dataset;
+                    if (data.monthly) {
+                        disbursement[data.monthly] = parseFloat(item.value);
+                    }
+                    else if (data.check) {
+                        if (data.check === 'number') {
+                            check_number = item.value;
+                        }
+                        else if (data.check === 'date') {
+                            check_date = item.value;
+                        }
+                        else if (data.check === 'amount') {
+                            check_amount = item.value;
+                        }
+                    }
+                });
+                if (check_number) {
+                    const payload = { tenant_id, ledger_month: ledgerMonth, check_number, check_amount, check_date, disbursement };
+                    setPayment(payload);
+                }
+            }
+    
+        }
+    */
     return (
         <div>
             <Link to="/">Return to Property List</Link>
@@ -210,9 +212,16 @@ function PropertyEdit() {
                 </thead>
                 <tbody>
                     <tr>
+                        {/* SCEP for this property, if applicable */}
                         <td>$<FeeInput data-fee="scep" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.scep || ''} /></td>
+
+                        {/* RFD for this property, if applicable */}
                         <td>$<FeeInput data-fee="rfd" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.rfd || ''} /></td>
+
+                        {/* Trash for this property, if applicable */}
                         <td>$<FeeInput data-fee="trash" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.trash || ''} /></td>
+
+                        {/* Parking for this property, if applicable */}
                         <td>$<FeeInput data-fee="parking" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.parking || ''} /></td>
                     </tr>
                 </tbody>
@@ -220,11 +229,11 @@ function PropertyEdit() {
 
             {/* Payment Month Dropdown */}
             <div className="month-selector">
-                <label htmlFor="paymentMonth">Payment Month:</label>
+                <label htmlFor="ledgerMonth">Payment Month:</label>
                 <select
-                    id="paymentMonth"
-                    value={paymentMonth}
-                    onChange={(e) => setPaymentMonth(e.target.value)}
+                    id="ledgerMonth"
+                    value={ledgerMonth}
+                    onChange={(e) => setledgerMonth(e.target.value)}
                 >
                     {generateMonthOptions()}
                 </select>
@@ -232,6 +241,7 @@ function PropertyEdit() {
 
             {/* Units Table */}
             <table className="unit-payments table table-striped">
+                {/* 
                 <thead>
                     <tr className="table-success">
                         <CenteredTh>Unit</CenteredTh>
@@ -247,66 +257,22 @@ function PropertyEdit() {
                         <CenteredTh>Check Date</CenteredTh>
                     </tr>
                 </thead>
+                */}
+                {units.map((unit, idx) => {
+                    const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
+                    return <LedgerEntry key={idx}
+                        unit={unit}
+                        month={ledgerMonth}
+                        ledgerData={ledgerRecord}
+                        propertyFees={propertyFees}
+                        feeCharged={feeCharged}
+                        defaultCheckDate={defaultCheckDate}
+                        propertyMonthlyTotal={propertyMonthlyTotal}
+                        paymentsReceivedTotal={paymentsReceivedTotal}
+                    />;
+
+                })}
                 <tbody>
-                    {units.map((unit, idx) => {
-                        columns = 2;
-                        const tenant_id = unit.tenant_id;
-                        const tenantPaymentData = paymentData.find(item => item.tenant_id == tenant_id);
-                        let { scep = null, rfd = null, trash = null, parking = null } = propertyFees;
-                        let monthlyTotal = unit.rent_amount;
-                        const fees = unit.unit_fees;
-                        if (fees) {
-                            if (fees.scep) scep = fees.scep;
-                            if (fees.rfd) rfd = fees.rfd;
-                            if (fees.trash) trash = fees.trash;
-                            if (fees.parking) parking = fees.parking;
-                        }
-                        let check_number = tenantPaymentData ? tenantPaymentData.check_number : '';
-                        let check_amount = monthlyTotal;
-                        let check_date = defaultCheckDate;
-                        if (scep) { monthlyTotal += scep; columns++; }
-                        if (rfd) { monthlyTotal += rfd; columns++; }
-                        if (trash) { monthlyTotal += trash; columns++; }
-                        if (parking) { monthlyTotal += parking; columns++; }
-
-                        propertyMonthlyTotal += monthlyTotal;
-                        if (check_number) {
-                            check_amount = tenantPaymentData.check_amount;
-                            console.log('====> check', check_number, check_amount);
-                            check_date = tenantPaymentData.check_date;
-                            paymentsReceivedTotal += parseFloat(check_amount);
-                        }
-
-                        return (<React.Fragment key={idx}>
-                            <tr data-unit_id={unit.unit_id}>
-                                <td><Link to={`/ledger-card/${unit.unit_id}`}>{unit.unit_number}</Link></td>
-                                <td><input data-monthly="rent" onBlur={handleUnitFees} defaultValue={unit.rent_amount} /></td>
-                                {feeCharged.scep && <td><input data-monthly="scep" onBlur={handleUnitFees} defaultValue={scep} /></td>}
-                                {feeCharged.rfd && <td><input data-monthly="rfd" onBlur={handleUnitFees} defaultValue={rfd} /></td>}
-                                {feeCharged.trash && <td><input data-monthly="trash" onBlur={handleUnitFees} defaultValue={trash} /></td>}
-                                {feeCharged.parking && <td><input data-monthly="parking" onBlur={handleUnitFees} defaultValue={parking} /></td>}
-                                <Money>{format$(monthlyTotal)}</Money>
-                                <td>{unit.first_name} {unit.last_name}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr data-tenant_id={tenant_id}>
-                                <td></td>
-                                <td><input data-monthly="rent" onChange={handlePayment} value={unit.rent_amount} /></td>
-                                {feeCharged.scep && <td><input data-monthly='scep' onChange={handlePayment} value={scep} /></td>}
-                                {feeCharged.rfd && <td><input data-monthly='rfd' onChange={handlePayment} value={rfd} /></td>}
-                                {feeCharged.trash && <td><input data-monthly='trash' onChange={handlePayment} value={trash} /></td>}
-                                {feeCharged.parking && <td><input data-monthly='parking' onChange={handlePayment} value={parking} /></td>}
-                                <td></td>
-                                <td style={{ textAlign: 'right' }}>Payment this month:</td>
-                                <td><CheckNoInput data-check="number" onChange={handlePayment} defaultValue={check_number} /></td>
-                                <td><PaymentInput data-check="amount" onChange={handlePayment} defaultValue={check_amount} /></td>
-                                <td><CheckDateInput data-check="date" onChange={handlePayment} defaultValue={check_date} /></td>
-                            </tr>
-                        </React.Fragment>
-                        )
-                    })}
                     <tr>
                         <td colSpan={columns} style={{ textAlign: 'right' }}>Property Total:</td>
                         <Money>{format$(propertyMonthlyTotal)}</Money>
@@ -316,6 +282,7 @@ function PropertyEdit() {
                         <td></td>
                     </tr>
                 </tbody>
+
             </table>
         </div>
     );
