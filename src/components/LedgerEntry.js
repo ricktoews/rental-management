@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getFirstDayOfNextMonth } from "../utils/helpers";
 import { saveLedgerEntry } from '../utils/apis';
+import { FEES } from "../config/constants";
 
 const StyledInput = styled.input`
     border-radius: 4px;
@@ -29,11 +30,13 @@ text-align: right;
 
 function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaultCheckDate, propertyMonthlyTotal, paymentsReceivedTotal }) {
     const [dueRent, setDueRent] = useState(unit.rent_amount);
+    const [dueFees, setDueFees] = useState({});
     const [dueSCEP, setDueSCEP] = useState(unit.unit_fees?.scep || '');
     const [dueRFD, setDueRFD] = useState(unit.unit_fees?.rfd || '');
     const [dueTrash, setDueTrash] = useState(unit.unit_fees?.Trash || '');
     const [dueParking, setDueParking] = useState(unit.unit_fees?.Parking || '');
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
+    const [paidFees, setPaidFees] = useState({});
     const [paidSCEP, setPaidSCEP] = useState(ledgerData?.disbursement?.scep || '');
     const [paidRFD, setPaidRFD] = useState(ledgerData?.disbursement?.rfd || '');
     const [paidTrash, setPaidTrash] = useState(ledgerData?.disbursement?.trash || '');
@@ -47,74 +50,67 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const [totalPaid, setTotalPaid] = useState('');
 
     const calcTotalDue = (rent = 0, scep = 0, rfd = 0, trash = 0, parking = 0) => {
-        const total = (1 * rent + 1 * scep + 1 * rfd + 1 * trash + 1 * parking).toFixed(2);
+        let total = dueRent;
+        FEES.forEach(feeObj => {
+            const feeKey = Object.keys(feeObj)[0];
+            total += 1 * dueFees[feeKey];
+        })
         console.log('====> calcTotalDue', total);
         setTotalDue(total);
     }
 
     const calcTotalPaid = (rent = 0, scep = 0, rfd = 0, trash = 0, parking = 0) => {
-        const total = (1 * rent + 1 * scep + 1 * rfd + 1 * trash + 1 * parking).toFixed(2);
+        let total = paidRent;
+        FEES.forEach(feeObj => {
+            const feeKey = Object.keys(feeObj)[0];
+            total += 1 * paidFees[feeKey];
+        })
+        //        console.log('====> calcTotalPaid paidFees', paidFees);
+        //        const total = (1 * rent + 1 * scep + 1 * rfd + 1 * trash + 1 * parking).toFixed(2);
         setTotalPaid(total);
         setCheckAmount(total);
     }
 
+    const getFeesForUnit = (fee_data) => {
+        const due = {};
+        FEES.forEach(feeObj => {
+            const fee = Object.keys(feeObj)[0];
+            due[fee] = fee_data[fee] || 0;
+        });
+        return due;
+    }
+
+    useEffect(() => {
+        let due = 0;
+        if (unit.unit_fees) {
+            due = getFeesForUnit(unit.unit_fees);
+        } else {
+            due = getFeesForUnit(propertyFees);
+        }
+        let total = dueRent;
+        FEES.forEach(feeObj => {
+            const feeKey = Object.keys(feeObj)[0];
+            total += (due[feeKey] || 0);
+        })
+        setPaidRent(dueRent);
+        setDueFees(due);
+        setPaidFees(due);
+        setTotalDue(total);
+        setCheckAmount(total);
+    }, []);
+
     useEffect(() => {
         if (ledgerData) {
-            console.log('====> LedgerEntry, ledgerData', ledgerData, 'unit', unit);
-            if (!ledgerData?.due_this_month) {
-                // Set due amounts to defaults.
-                const { scep, rfd, trash, parking } = (unit.unit_fees || {});
-                setDueRent(unit.rent_amount);
-                setDueSCEP(scep);
-                setDueRFD(rfd);
-                setDueTrash(trash);
-                setDueParking(parking);
-                calcTotalDue(unit.rent_amount, scep, rfd, trash, parking);
-            } else {
-                // Set due amounts to data from ledger table.
-                const { rent, scep, rfd, trash, parking } = ledgerData.due_this_month;
-                setDueRent(rent);
-                setDueSCEP(scep);
-                setDueRFD(rfd);
-                setDueTrash(trash);
-                setDueParking(parking);
-                calcTotalDue(rent, scep, rfd, trash, parking);
-            }
-            if (!ledgerData?.disbursement) {
-                // Set default payment amounts
-            } else {
-                // Set payment amounts from ledger table.
-                const { rent, scep, rfd, trash, parking } = ledgerData.disbursements;
-                setPaidRent(rent);
-                setPaidSCEP(scep);
-                setPaidRFD(rfd);
-                setPaidTrash(trash);
-                setPaidParking(parking);
-                calcTotalPaid(rent, scep, rfd, trash, parking);
-            }
-
-            setCheckAmount(ledgerData.check_amount);
+            const due = getFeesForUnit(ledgerData.due_this_month);
+            setDueFees(due);
+            const paid = getFeesForUnit(ledgerData.disbursements);
+            setPaidFees(paid);
             setCheckNumber(ledgerData.check_number);
+            setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
-
+            console.log('====> Initializing from ledgerData', ledgerData);
         }
-        else {
-            const rent = unit.rent_amount;
-            const scep = unit.unit_fees?.scep || 0;
-            const rfd = unit.unit_fees?.rfd || 0;
-            const trash = unit.unit_fees?.trash || 0;
-            const parking = unit.unit_fees?.parking || 0;
-            setTotalDue(rent + scep + rfd + trash + parking);
-            setPaidRent(rent);
-            setPaidSCEP(scep);
-            setPaidRFD(rfd);
-            setPaidTrash(trash);
-            setPaidParking(parking);
-            calcTotalPaid(rent, scep, rfd, trash, parking);
-            setCheckAmount(rent + scep + rfd + trash + parking);
-
-        }
-    }, [ledgerData]);
+    }, [ledgerData])
 
     useEffect(() => {
         if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
@@ -128,14 +124,15 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const handleSaveLedger = () => {
         if (!checkNumber) return;
 
+        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
         const payload = {
             tenant_id,
             ledger_month: month,
             check_number: checkNumber,
             check_amount: 1 * checkAmount,
             check_date: checkDate,
-            due_this_month: { rent: 1 * dueRent, scep: 1 * dueSCEP, rfd: 1 * dueRFD, trash: 1 * dueTrash, parking: 1 * dueParking },
-            disbursement: { rent: 1 * paidRent, scep: 1 * paidSCEP, rfd: 1 * paidRFD, trash: 1 * paidTrash, parking: 1 * paidParking }
+            due_this_month: { rent: 1 * dueRent, ...dueFees },
+            disbursement: { rent: 1 * paidRent, ...paidFees }
 
         };
         console.log('====> handleSaveLedger', payload);
@@ -144,27 +141,28 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
 
     const handleDueRent = e => {
         const el = e.currentTarget;
+        setIsDirty(true);
         setDueRent(el.value);
     }
 
-    const handleDueSCEP = e => {
+    const handleDueFees = e => {
         const el = e.currentTarget;
-        setDueSCEP(el.value);
+        const due = el.value;
+        const feeKey = el.dataset.monthly;
+        setIsDirty(true);
+        setDueFees({ ...dueFees, [feeKey]: due });
+        //console.log('====> handleDueFees, fee', due, feeKey);
     }
 
-    const handleDueRFD = e => {
+    const handlePaidFees = e => {
         const el = e.currentTarget;
-        setDueRFD(el.value);
-    }
+        if (el.value === '') return;
 
-    const handleDueTrash = e => {
-        const el = e.currentTarget;
-        setDueTrash(el.value);
-    }
-
-    const handleDueParking = e => {
-        const el = e.currentTarget;
-        setDueParking(el.value);
+        const paid = el.value;
+        const feeKey = el.dataset.monthly;
+        setIsDirty(true);
+        setPaidFees({ ...paidFees, [feeKey]: paid });
+        console.log('====> handlePaidFees, fee', paid, feeKey);
     }
 
     const handlePaidRent = e => {
@@ -173,44 +171,15 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         setPaidRent(el.value);
     }
 
-    const handlePaidSCEP = e => {
-        const el = e.currentTarget;
-        setIsDirty(true);
-        setPaidSCEP(el.value);
-    }
-
-    const handlePaidRFD = e => {
-        const el = e.currentTarget;
-        setIsDirty(true);
-        setPaidRFD(el.value);
-    }
-
-    const handlePaidTrash = e => {
-        const el = e.currentTarget;
-        setIsDirty(true);
-        setPaidTrash(el.value);
-    }
-
-    const handlePaidParking = e => {
-        const el = e.currentTarget;
-        setIsDirty(true);
-        setPaidParking(el.value);
-    }
 
     // I don't like this. It's a serious pain to have to deal with each breakdown (SCEP, RFD, &c.) in each place.
     const fillInCheckDisbursement = () => {
         setPaidRent(dueRent);
-        setPaidSCEP(dueSCEP);
-        setPaidRFD(dueRFD);
-        setPaidTrash(dueTrash);
-        setPaidParking(dueParking);
+        setPaidFees(dueFees);
     }
     const clearCheckisbursement = () => {
         setPaidRent(0);
-        setPaidSCEP(0);
-        setPaidRFD(0);
-        setPaidTrash(0);
-        setPaidParking(0);
+        setPaidFees({});
     }
 
     const handleCheckAmount = e => {
@@ -246,6 +215,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
 
     const recalcDue = e => {
         calcTotalDue(dueRent, dueSCEP, dueRFD, dueTrash, dueParking);
+        handleSaveIfDirty(e);
     }
 
     const recalcPaid = e => {
@@ -268,17 +238,15 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 {/* Rent due this month */}
                 <td>Due this month:  <b>Rent</b> <input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} /></td>
 
-                {/* SCEP due this month (if applicable) */}
-                {feeCharged.scep && <td><b>SCEP</b> <input data-monthly="due-scep" onBlur={recalcDue} onChange={handleDueSCEP} value={dueSCEP} /></td>}
-
-                {/* RFD due this month (if applicable) */}
-                {feeCharged.rfd && <td><b>RFD</b> <input data-monthly="due-rfd" onBlur={recalcDue} onChange={handleDueRFD} value={dueRFD} /></td>}
-
-                {/* Trash due this month (if applicable) */}
-                {feeCharged.trash && <td><b>Trash</b> <input data-monthly="due-trash" onBlur={recalcDue} onChange={handleDueTrash} value={dueTrash} /></td>}
-
-                {/* Parking due this month (if applicable) */}
-                {feeCharged.parking && <td><b>Parking</b> <input data-monthly="due-parking" onBlur={recalcDue} onChange={handleDueParking} value={dueParking} /></td>}
+                {FEES.map((feeObj, key) => {
+                    const feeKey = Object.keys(feeObj)[0];
+                    const feeValue = Object.values(feeObj)[0];
+                    if (propertyFees[feeKey] > 0) {
+                        return <td key={key}><b>{feeValue}</b> <input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} /></td>
+                    } else {
+                        return null;
+                    }
+                })}
 
                 {/* Total due this month (should match check amount in most cases) */}
                 <td>Total due: {format$(totalDue)}</td>
@@ -311,17 +279,15 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 {/* Rent payment received this month */}
                 <td>Paid this month: <b>Rent</b> <input data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={paidRent} /></td>
 
-                {/* SCEP payment received this month, if applicable */}
-                {feeCharged.scep && <td><b>SCEP</b> <input data-monthly='paid-scep' onBlur={recalcPaid} onChange={handlePaidSCEP} value={paidSCEP} /></td>}
-
-                {/* RFD payment received this month, if applicable */}
-                {feeCharged.rfd && <td><b>RFD</b> <input data-monthly='paid-rfd' onBlur={recalcPaid} onChange={handlePaidRFD} value={paidRFD} /></td>}
-
-                {/* Trash payment received this month, if applicable */}
-                {feeCharged.trash && <td><b>Trash</b> <input data-monthly='paid-trash' onBlur={recalcPaid} onChange={handlePaidTrash} value={paidTrash} /></td>}
-
-                {/* Parking payment received this month, if applicable */}
-                {feeCharged.parking && <td><b>Parking</b> <input data-monthly='paid-parking' onBlur={recalcPaid} onChange={handlePaidParking} value={paidParking} /></td>}
+                {FEES.map((feeObj, key) => {
+                    const feeKey = Object.keys(feeObj)[0];
+                    const feeValue = Object.values(feeObj)[0];
+                    if (propertyFees[feeKey] > 0) {
+                        return <td key={key}><b>{feeValue}</b> <input data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
+                    } else {
+                        return null;
+                    }
+                })}
 
                 <td></td>
                 <td></td>

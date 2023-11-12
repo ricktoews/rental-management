@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
 import { format$, getFirstDayOfNextMonth } from '../utils/helpers';
 import LedgerEntry from './LedgerEntry';
+import { FEES } from '../config/constants';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -133,67 +134,7 @@ function PropertyEdit() {
         setPropertyFees({ ...propertyFees, [feeProperty]: value });
         setTriggerSave(true);
     }
-    /*
-        const handleUnitFees = e => {
-            const el = e.currentTarget;
-            const parentTr = el.closest('tr');
-            if (parentTr) {
-                const unit_id = parseInt(parentTr.dataset.unit_id, 10);
-                const inputEls = Array.from(parentTr.querySelectorAll('input'));
-                const monthly_fees = {};
-                let rent_amount;
-                inputEls.forEach(item => {
-                    const data = item.dataset;
-                    if (data.monthly) {
-                        if (data.monthly === 'rent') {
-                            rent_amount = parseFloat(item.value);
-                        } else {
-                            monthly_fees[data.monthly] = parseFloat(item.value);
-                        }
-                    }
-                });
-                const unit_record = units.find(unit => unit.unit_id === unit_id);
-                unit_record.unit_fees = monthly_fees;
-                const payload = { rent_amount, monthly_fees };
-                setUnits([...units]);
-                saveUnitMonthlyFees(unit_id, payload);
-            }
-        }
-    */
-    /*
-        const handlePayment = e => {
-            const el = e.currentTarget;
-            const parentTr = el.closest('tr');
-            if (parentTr) {
-                const tenant_id = parentTr.dataset.tenant_id;
-                const inputEls = Array.from(parentTr.querySelectorAll('input'));
-                const disbursement = {};
-                let check_number, check_date, check_amount;
-                inputEls.forEach(item => {
-                    const data = item.dataset;
-                    if (data.monthly) {
-                        disbursement[data.monthly] = parseFloat(item.value);
-                    }
-                    else if (data.check) {
-                        if (data.check === 'number') {
-                            check_number = item.value;
-                        }
-                        else if (data.check === 'date') {
-                            check_date = item.value;
-                        }
-                        else if (data.check === 'amount') {
-                            check_amount = item.value;
-                        }
-                    }
-                });
-                if (check_number) {
-                    const payload = { tenant_id, ledger_month: ledgerMonth, check_number, check_amount, check_date, disbursement };
-                    setPayment(payload);
-                }
-            }
-    
-        }
-    */
+
     return (
         <div>
             <Link to="/">Return to Property List</Link>
@@ -204,25 +145,19 @@ function PropertyEdit() {
             <PropertyTable className="property-fees table">
                 <thead>
                     <tr className="table-success">
-                        <CenteredTh>SCEP</CenteredTh>
-                        <CenteredTh>RFD</CenteredTh>
-                        <CenteredTh>Trash</CenteredTh>
-                        <CenteredTh>Parking</CenteredTh>
+                        {FEES.map((feeObj, key) => {
+                            const feeLabel = Object.values(feeObj)[0];
+                            return <CenteredTh key={key}>{feeLabel}</CenteredTh>
+                        })}
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        {/* SCEP for this property, if applicable */}
-                        <td>$<FeeInput data-fee="scep" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.scep || ''} /></td>
-
-                        {/* RFD for this property, if applicable */}
-                        <td>$<FeeInput data-fee="rfd" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.rfd || ''} /></td>
-
-                        {/* Trash for this property, if applicable */}
-                        <td>$<FeeInput data-fee="trash" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.trash || ''} /></td>
-
-                        {/* Parking for this property, if applicable */}
-                        <td>$<FeeInput data-fee="parking" onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees.parking || ''} /></td>
+                        {FEES.map((feeObj, key) => {
+                            const feeKey = Object.keys(feeObj)[0];
+                            const feeLabel = Object.values(feeObj)[0];
+                            return <td key={key}>$<FeeInput data-fee={feeKey} onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees[feeKey] || ''} /></td>
+                        })}
                     </tr>
                 </tbody>
             </PropertyTable>
@@ -241,23 +176,6 @@ function PropertyEdit() {
 
             {/* Units Table */}
             <table className="unit-payments table table-striped">
-                {/* 
-                <thead>
-                    <tr className="table-success">
-                        <CenteredTh>Unit</CenteredTh>
-                        <CenteredTh>Rent</CenteredTh>
-                        {feeCharged.scep && <CenteredTh>SCEP</CenteredTh>}
-                        {feeCharged.rfd && <CenteredTh>RFD</CenteredTh>}
-                        {feeCharged.trash && <CenteredTh>Trash</CenteredTh>}
-                        {feeCharged.parking && <CenteredTh>Parking</CenteredTh>}
-                        <CenteredTh>Monthly Total</CenteredTh>
-                        <CenteredTh>Tenant</CenteredTh>
-                        <CenteredTh>Check Number</CenteredTh>
-                        <CenteredTh>Check Amount</CenteredTh>
-                        <CenteredTh>Check Date</CenteredTh>
-                    </tr>
-                </thead>
-                */}
                 {units.map((unit, idx) => {
                     const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
                     return <LedgerEntry key={idx}

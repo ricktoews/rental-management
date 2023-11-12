@@ -9,3 +9,11 @@ export const REST = {
     getPayments: API_BASE + '/get-payments',
     getLedgerCard: API_BASE + '/ledger-card/',
 };
+
+export const FEES = [
+    { 'scep': 'SCEP' },
+    { 'rfd': 'RFD' },
+    { 'trash': 'Trash' },
+    { 'parking': 'Parking' }
+]
+
