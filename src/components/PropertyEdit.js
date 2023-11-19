@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
 import { format$, getFirstDayOfNextMonth } from '../utils/helpers';
 import LedgerEntry from './LedgerEntry';
-import { FEES } from '../config/constants';
+import { FEES, MONTH_NAMES } from '../config/constants';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -56,9 +56,9 @@ const StyledLabel = styled.label`
 
 function PropertyEdit() {
     let { propertyId } = useParams();
-    const nextMonth = (new Date().getMonth() + 2) % 12;
+    const nextMonth = (new Date().getMonth() + 2) % 12 + 1;
     const [address, setAddress] = useState('');
-    const [ledgerMonth, setledgerMonth] = useState(nextMonth);
+    const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
     const [propertyFees, setPropertyFees] = useState({});
     const [feeCharged, setFeeCharged] = useState({});
@@ -109,20 +109,15 @@ function PropertyEdit() {
         if (tenantIds.length > 0) {
             getPayments(ledgerMonth, tenantIds)
                 .then(res => {
+                    console.log('====> data for month', ledgerMonth, res);
                     setLedgerData(res);
                 });
         }
     }, [ledgerMonth, units])
 
     const generateMonthOptions = () => {
-        const months = [
-            'January', 'February', 'March', 'April',
-            'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December'
-        ];
-
         // Generate options starting from the next month
-        return months.map((month, index) => {
+        return MONTH_NAMES.map((month, index) => {
             return <option key={index} value={index + 1}>{month}</option>;
         });
     };
@@ -168,7 +163,7 @@ function PropertyEdit() {
                 <select
                     id="ledgerMonth"
                     value={ledgerMonth}
-                    onChange={(e) => setledgerMonth(e.target.value)}
+                    onChange={(e) => setLedgerMonth(e.target.value)}
                 >
                     {generateMonthOptions()}
                 </select>

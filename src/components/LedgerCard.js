@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getLedgerCard } from '../utils/apis.js';
 import { processLedgerData } from './LedgerCardUtils.js';
+import { FEES, MONTH_NAMES } from '../config/constants';
 
 function LedgerCard() {
     const { unitId } = useParams();
@@ -39,29 +40,49 @@ function LedgerCard() {
                 <thead>
                     <tr className="table-success">
                         <th>Payment Month</th>
-                        <th>Rent Amount</th>
-                        {Object.keys(ledgerData[0].fees).map(item => <th key={item}>{item.toUpperCase()}</th>)}
-                        <th>Total Due</th>
-                        <th>Check #</th>
-                        <th>Check Date</th>
-                        <th>Check Amount</th>
-                        {Object.keys(ledgerData[0].disbursements).map(item => <th key={item}>{item}</th>)}
+                        <th></th>
+                        <th>Rent</th>
+                        {FEES.map(feeObj => {
+                            const feeLabel = Object.values(feeObj)[0];
+                            return <td key={feeLabel}>{feeLabel}</td>
+                        })}
+                        <th>Total</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {ledgerData.map((entry, key) => (
-                        <tr key={key}>
-                            <td>{entry.ledger_month}</td>
-                            <td>{entry.rent}</td>
-                            {Object.keys(entry.fees).map(item => <td key={item}>{entry.fees[item]}</td>)}
-                            <td>{entry.total_due_fmt}</td>
-                            <td>{entry.check_number}</td>
-                            <td>{entry.check_date}</td>
-                            <td>{entry.paid}</td>
-                            {Object.keys(entry.disbursements).map(item => <td key={item}>{entry.disbursements[item]}</td>)}
-                        </tr>
-                    ))}
-                </tbody>
+                {ledgerData.map((entry, key) => {
+                    console.log('====> ledger entry', entry);
+                    return (
+                        <tbody>
+                            <tr key={key}>
+                                <td>{MONTH_NAMES[entry.ledger_month]}</td>
+                                <td>DUE</td>
+                                <td>{entry.dueRent}</td>
+                                {FEES.map(feeObj => {
+                                    const feeKey = Object.keys(feeObj)[0];
+                                    return <td key={feeKey}>{entry.dueFees[feeKey]}</td>
+                                })}
+                                <td>{entry.totalDue}</td>
+                            </tr>
+                            <tr key={key}>
+                                <td></td>
+                                <td>PAID</td>
+                                <td>{entry.paidRent}</td>
+                                {FEES.map(feeObj => {
+                                    const feeKey = Object.keys(feeObj)[0];
+                                    return <td key={feeKey}>{entry.paidFees[feeKey]}</td>
+                                })}
+                                <td>{entry.totalPaid}</td>
+                            </tr>
+                            <tr key={key}>
+                                <td></td>
+                                <td>Payment</td>
+                                <td>Check # {entry.check_number}</td>
+                                <td>Check date: {entry.check_date}</td>
+                                <td>Check amount: {entry.check_amount}</td>
+                            </tr>
+                        </tbody>
+                    )
+                })}
             </table>
 
         </div>

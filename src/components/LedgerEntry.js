@@ -31,16 +31,8 @@ text-align: right;
 function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaultCheckDate, propertyMonthlyTotal, paymentsReceivedTotal }) {
     const [dueRent, setDueRent] = useState(unit.rent_amount);
     const [dueFees, setDueFees] = useState({});
-    const [dueSCEP, setDueSCEP] = useState(unit.unit_fees?.scep || '');
-    const [dueRFD, setDueRFD] = useState(unit.unit_fees?.rfd || '');
-    const [dueTrash, setDueTrash] = useState(unit.unit_fees?.Trash || '');
-    const [dueParking, setDueParking] = useState(unit.unit_fees?.Parking || '');
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
     const [paidFees, setPaidFees] = useState({});
-    const [paidSCEP, setPaidSCEP] = useState(ledgerData?.disbursement?.scep || '');
-    const [paidRFD, setPaidRFD] = useState(ledgerData?.disbursement?.rfd || '');
-    const [paidTrash, setPaidTrash] = useState(ledgerData?.disbursement?.trash || '');
-    const [paidParking, setPaidParking] = useState(ledgerData?.disbursement?.parking || '');
     const [checkAmount, setCheckAmount] = useState(ledgerData?.check_amount || '');
     const [checkNumber, setCheckNumber] = useState(ledgerData?.check_number || '');
     const [checkDate, setCheckDate] = useState(ledgerData?.check_date || getFirstDayOfNextMonth());
@@ -49,8 +41,8 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
 
-    const calcTotalDue = (rent = 0, scep = 0, rfd = 0, trash = 0, parking = 0) => {
-        let total = dueRent;
+    const calcTotalDue = () => {
+        let total = 1 * dueRent;
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
             total += 1 * dueFees[feeKey];
@@ -59,7 +51,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         setTotalDue(total);
     }
 
-    const calcTotalPaid = (rent = 0, scep = 0, rfd = 0, trash = 0, parking = 0) => {
+    const calcTotalPaid = () => {
         let total = paidRent;
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
@@ -87,28 +79,47 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         } else {
             due = getFeesForUnit(propertyFees);
         }
-        let total = dueRent;
+        let _totalDue = 1 * dueRent;
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
-            total += (due[feeKey] || 0);
+            _totalDue += (due[feeKey] || 0);
         })
         setPaidRent(dueRent);
         setDueFees(due);
         setPaidFees(due);
-        setTotalDue(total);
-        setCheckAmount(total);
+        setTotalDue(_totalDue);
+        setTotalPaid(0);
+        setCheckAmount(_totalDue);
     }, []);
 
     useEffect(() => {
         if (ledgerData) {
-            const due = getFeesForUnit(ledgerData.due_this_month);
+            const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
-            const paid = getFeesForUnit(ledgerData.disbursements);
+            const paid = getFeesForUnit(ledgerData.paid_fees);
+            let _totalDue = 1 * ledgerData.due_rent;
+            FEES.forEach(feeObj => {
+                const feeKey = Object.keys(feeObj)[0];
+                _totalDue += (due[feeKey] || 0);
+            })
+            let _totalPaid = 1 * ledgerData.paid_rent;
+            FEES.forEach(feeObj => {
+                const feeKey = Object.keys(feeObj)[0];
+                _totalPaid += (paid[feeKey] || 0);
+            })
+
+            setDueRent(1 * ledgerData.due_rent);
+            setPaidRent(1 * ledgerData.paid_rent);
+            setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(ledgerData.check_number);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
-            console.log('====> Initializing from ledgerData', ledgerData);
+            setTotalDue(_totalDue);
+            setTotalPaid(_totalPaid);
+        } else {
+            setCheckNumber('');
+            setTotalPaid(0);
         }
     }, [ledgerData])
 
@@ -131,8 +142,10 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
             check_number: checkNumber,
             check_amount: 1 * checkAmount,
             check_date: checkDate,
-            due_this_month: { rent: 1 * dueRent, ...dueFees },
-            disbursement: { rent: 1 * paidRent, ...paidFees }
+            due_rent: 1 * dueRent,
+            paid_rent: 1 * paidRent,
+            due_fees: dueFees,
+            paid_fees: paidFees
 
         };
         console.log('====> handleSaveLedger', payload);
@@ -214,12 +227,12 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }
 
     const recalcDue = e => {
-        calcTotalDue(dueRent, dueSCEP, dueRFD, dueTrash, dueParking);
+        calcTotalDue();
         handleSaveIfDirty(e);
     }
 
     const recalcPaid = e => {
-        calcTotalPaid(paidRent, paidSCEP, paidRFD, paidTrash, paidParking);
+        calcTotalPaid();
         handleSaveIfDirty(e);
     }
 
@@ -289,8 +302,9 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                     }
                 })}
 
-                <td></td>
-                <td></td>
+
+                <td>{totalPaid > 0 && `Total paid: ${format$(totalPaid)}` || null}</td>
+
                 <td></td>
                 <td></td>
                 <td></td>
