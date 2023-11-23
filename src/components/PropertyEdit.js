@@ -172,7 +172,9 @@ function PropertyEdit() {
             {/* Units Table */}
             <table className="unit-payments table table-striped">
                 {units.map((unit, idx) => {
+                    console.log('====> Ledger Data:', unit.unit_id, ledgerData);
                     const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
+                    console.log('====> Ledger Record:', ledgerRecord);
                     return <LedgerEntry key={idx}
                         unit={unit}
                         month={ledgerMonth}

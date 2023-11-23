@@ -19,15 +19,14 @@ export const getFeeAmounts = (feeHeadings, rowFees) => {
 
 export const processLedgerData = rows => {
     const feeHeadings = getFeeHeadings(rows[0].due_fees);
-    console.log('====> feeHeadings', feeHeadings);
     const table_data = [];
     rows.forEach(row => {
         const { property_id, unit_id, unit_fees, first_name, last_name, ledger_month, check_number, check_date, check_amount, due_rent, paid_rent, due_fees, paid_fees } = row;
 
-        const row_data = { property_id, unit_id, unit_fees, ledger_month, due_rent, paid_rent, dueFees: {}, paidFees: {}, totalDue: due_rent, totalPaid: paid_rent, check_number, check_amount, check_date };
+        const row_data = { property_id, unit_id, unit_fees, ledger_month, due_rent, paid_rent, dueFees: {}, paidFees: {}, totalDue: 1 * due_rent, totalPaid: 1 * paid_rent, check_number, check_amount, check_date };
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
-            if (unit_fees[feeKey]) {
+            if (unit_fees && unit_fees[feeKey]) {
                 const due = 1 * due_fees[feeKey];
                 const paid = 1 * paid_fees[feeKey];
                 row_data.dueFees[feeKey] = due;

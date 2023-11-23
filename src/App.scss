@@ -199,3 +199,13 @@ table.unit-payments tr input[data-monthly]::before {
   font-weight: bold;
   /* Adjust font styles as needed */
 }
+
+/*
+tbody:not(.entered) td {
+  color: #ccc;
+}
+*/
+
+.entered td {
+  color: #000;
+}

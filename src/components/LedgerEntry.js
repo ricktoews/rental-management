@@ -12,7 +12,7 @@ const StyledInput = styled.input`
 `;
 
 const PaymentInput = styled(StyledInput)`
-    width: 100px;
+    width: 75px;
     text-align: right;
 `;
 
@@ -40,6 +40,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const [isDirty, setIsDirty] = useState(false);
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
+    const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
 
     const calcTotalDue = () => {
         let total = 1 * dueRent;
@@ -93,6 +94,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }, []);
 
     useEffect(() => {
+        console.log('====> ledger data changed', ledgerData);
         if (ledgerData) {
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
@@ -112,11 +114,13 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
             setPaidRent(1 * ledgerData.paid_rent);
             setDueFees(due);
             setPaidFees(paid);
+            console.log('====> setting check number from ledgerData change', ledgerData.check_number);
             setCheckNumber(ledgerData.check_number);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
             setTotalDue(_totalDue);
             setTotalPaid(_totalPaid);
+            setLedgerDataEntered(true);
         } else {
             setCheckNumber('');
             setTotalPaid(0);
@@ -210,6 +214,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const handleCheckNumber = e => {
         const el = e.currentTarget;
         setIsDirty(true);
+        console.log('====> setting check number from check number change', el.value);
         setCheckNumber(el.value);
     }
 
@@ -238,8 +243,9 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
 
     const tenant_id = unit.tenant_id;
 
+    const style = { color: 'green' };
     return (
-        <tbody className="ledger-entry">
+        <tbody className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
             <tr>
                 <td>Unit <Link to={`/ledger-card/${unit.unit_id}`}>{unit.unit_number}</Link></td>
                 <td colSpan={8}>Tenant: {unit.first_name} {unit.last_name}</td>
@@ -249,13 +255,13 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 {/* These amounts should default to values from units but saved to ledger table. */}
 
                 {/* Rent due this month */}
-                <td>Due this month:  <b>Rent</b> <input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} /></td>
+                <td>Due this month:  <b>Rent</b> $<input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} /></td>
 
                 {FEES.map((feeObj, key) => {
                     const feeKey = Object.keys(feeObj)[0];
                     const feeValue = Object.values(feeObj)[0];
                     if (propertyFees[feeKey] > 0) {
-                        return <td key={key}><b>{feeValue}</b> <input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} /></td>
+                        return <td key={key}><b>{feeValue}</b> $<input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} /></td>
                     } else {
                         return null;
                     }
@@ -273,7 +279,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 <td></td>
 
                 {/* Check amount received this month (should match total due this month) */}
-                <td><b>Check amount</b> <PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} defaultValue={checkAmount} /></td>
+                <td><b>Check amount</b> $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} defaultValue={checkAmount} /></td>
 
                 <td><b>Check #</b> <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} defaultValue={checkNumber} /></td>
 
@@ -290,13 +296,13 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 <td></td>
 
                 {/* Rent payment received this month */}
-                <td>Paid this month: <b>Rent</b> <input data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={paidRent} /></td>
+                <td>Paid this month: <b>Rent</b> $<input data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={paidRent} /></td>
 
                 {FEES.map((feeObj, key) => {
                     const feeKey = Object.keys(feeObj)[0];
                     const feeValue = Object.values(feeObj)[0];
                     if (propertyFees[feeKey] > 0) {
-                        return <td key={key}><b>{feeValue}</b> <input data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
+                        return <td key={key}><b>{feeValue}</b> $<input data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
                     } else {
                         return null;
                     }

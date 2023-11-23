@@ -50,13 +50,13 @@ function LedgerCard() {
                     </tr>
                 </thead>
                 {ledgerData.map((entry, key) => {
-                    console.log('====> ledger entry', entry);
+                    console.log('====> ledger entry (due rent)', entry.totalDue, entry);
                     return (
                         <tbody>
                             <tr key={key}>
                                 <td>{MONTH_NAMES[entry.ledger_month]}</td>
                                 <td>DUE</td>
-                                <td>{entry.dueRent}</td>
+                                <td>{entry.due_rent}</td>
                                 {FEES.map(feeObj => {
                                     const feeKey = Object.keys(feeObj)[0];
                                     return <td key={feeKey}>{entry.dueFees[feeKey]}</td>
@@ -66,7 +66,7 @@ function LedgerCard() {
                             <tr key={key}>
                                 <td></td>
                                 <td>PAID</td>
-                                <td>{entry.paidRent}</td>
+                                <td>{entry.paid_rent}</td>
                                 {FEES.map(feeObj => {
                                     const feeKey = Object.keys(feeObj)[0];
                                     return <td key={feeKey}>{entry.paidFees[feeKey]}</td>
