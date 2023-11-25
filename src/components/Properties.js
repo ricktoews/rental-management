@@ -53,6 +53,7 @@ const Properties = () => {
     if (value.length >= 1) {
       const _filteredTenants = tenants.filter(item => item.last_name.substring(0, value.length) == value)
       setFilteredTenants(_filteredTenants);
+      tenantDropdownRef.current.style.display = 'block';
     }
   }
 
@@ -61,6 +62,7 @@ const Properties = () => {
     const tenantId = el.dataset.id;
     getPaymentEntryData(tenantId, ledgerMonth)
       .then(res => {
+        tenantDropdownRef.current.style.display = 'none';
         setPaymentEntryData({
           unit: { unit_id: res.unit_id, unit_number: res.unit_number, unit_fees: res.unit_fees, rent_amount: res.unit_rent, tenant_id: res.tenant_id, last_name: res.last_name, first_name: res.first_name },
           ledgerMonth: res.ledger_month,
@@ -80,7 +82,7 @@ const Properties = () => {
 
       <div style={{ position: 'relative' }} className="tenant-dropdown-container">
         <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} />
-        <div style={{ position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
+        <div ref={tenantDropdownRef} style={{ display: 'none', position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
           {filteredTenants.map((item, key) => {
             return <div key={key} data-id={item.tenant_id} onClick={handleTenantClick} style={{ cursor: 'pointer', borderBottom: '1px solid #ccc' }}>{item.last_name}, {item.first_name}</div>
           })}
