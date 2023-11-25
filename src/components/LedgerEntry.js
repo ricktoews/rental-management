@@ -41,7 +41,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
     const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
-
+    console.log('====> LedgerEntry, dueRent', dueRent, unit, unit.rent_amount);
     const calcTotalDue = () => {
         let total = 1 * dueRent;
         FEES.forEach(feeObj => {
@@ -64,7 +64,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         setCheckAmount(total);
     }
 
-    const getFeesForUnit = (fee_data) => {
+    const getFeesForUnit = (fee_data = {}) => {
         const due = {};
         FEES.forEach(feeObj => {
             const fee = Object.keys(feeObj)[0];
@@ -95,7 +95,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
 
     useEffect(() => {
         console.log('====> ledger data changed', ledgerData);
-        if (ledgerData) {
+        if (typeof ledgerData === 'object' && Object.keys(ledgerData).length > 0) {
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
             const paid = getFeesForUnit(ledgerData.paid_fees);
@@ -114,7 +114,6 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
             setPaidRent(1 * ledgerData.paid_rent);
             setDueFees(due);
             setPaidFees(paid);
-            console.log('====> setting check number from ledgerData change', ledgerData.check_number);
             setCheckNumber(ledgerData.check_number);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);

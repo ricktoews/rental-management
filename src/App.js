@@ -74,28 +74,28 @@ function App() {
   return (
     <Router>
       <div className="App">
-      <div ref={navContainerRef} onClick={checkMenuClick} className="nav-container">
-        <nav>
-          <ul>
-            <li><Link to="/" onClick={toggleMenu}>Properties</Link></li>
-            <li><Link to="/property-edit" onClick={toggleMenu}>Units</Link></li>
-            <li><Link to="/tenants" onClick={toggleMenu}>Tenants</Link></li>
-          </ul>
-        </nav>
-      </div>
-      <div className="fixed-header">
-        <header>
-          {/*<Hamburger onClick={toggleMenu} />*/}
-          Properties
-        </header>
-      </div>
-      <div className="container app-content">
-        <Routes>
-          <Route path="/" element={<Properties />} />
-          <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
-          <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
-          <Route path="/properties" element={<PropertyDropdown />} />
-        </Routes>
+        <div ref={navContainerRef} onClick={checkMenuClick} className="nav-container">
+          <nav>
+            <ul>
+              <li><Link to="/" onClick={toggleMenu}>Properties</Link></li>
+              <li><Link to="/property-edit" onClick={toggleMenu}>Units</Link></li>
+              <li><Link to="/tenants" onClick={toggleMenu}>Tenants</Link></li>
+            </ul>
+          </nav>
+        </div>
+        <div className="fixed-header">
+          <header>
+            {/*<Hamburger onClick={toggleMenu} />*/}
+            Rental Management
+          </header>
+        </div>
+        <div className="container app-content">
+          <Routes>
+            <Route path="/" element={<Properties />} />
+            <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
+            <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
+            <Route path="/properties" element={<PropertyDropdown />} />
+          </Routes>
         </div>
       </div>
     </Router>

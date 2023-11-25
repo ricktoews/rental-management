@@ -1,5 +1,21 @@
 import { REST } from '../config/constants';
 
+export const getTenants = async () => {
+    try {
+        const response = await fetch(REST.tenants);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        let data = await response.json();
+        data = data.filter(item => item.last_name > '');
+        return data;
+    } catch (error) {
+        console.error("There was a problem fetching the tenants:", error);
+        throw error;  // or return some default/fallback data if desired
+    }
+}
+
+
 // Assuming REST is an object with a 'properties' key holding the URL
 export const getProperties = async () => {
     try {
@@ -106,6 +122,28 @@ export const getPayments = async (ledger_month, tenant_ids) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
+export const getPaymentEntryData = async (tenant_id, ledger_month) => {
+    const payload = { ledger_month, tenant_id };
+    try {
+        const response = await fetch(`${REST.getPaymentEntryData}/${tenant_id}/${ledger_month}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
         });
 
         if (!response.ok) {
