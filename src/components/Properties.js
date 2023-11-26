@@ -66,7 +66,18 @@ const Properties = () => {
         setPaymentEntryData({
           unit: { unit_id: res.unit_id, unit_number: res.unit_number, unit_fees: res.unit_fees, rent_amount: res.unit_rent, tenant_id: res.tenant_id, last_name: res.last_name, first_name: res.first_name },
           ledgerMonth: res.ledger_month,
-          ledgerRecord: ledgerRecord,
+          ledgerData: {
+            check_amount: res.check_amount,
+            check_number: res.check_number,
+            check_date: res.check_date,
+            ledger_id: res.ledger_id,
+            ledger_month: res.ledger_month,
+            due_fees: res.due_fees,
+            due_rent: res.due_rent,
+            paid_fees: res.paid_fees,
+            paid_rent: res.paid_rent,
+            tenant_id: res.tenant_id
+          },
           propertyFees: res.property_fees,
         })
       });
@@ -92,7 +103,7 @@ const Properties = () => {
           <LedgerEntry
             unit={paymentEntryData.unit}
             month={paymentEntryData.ledgerMonth}
-            ledgerData={paymentEntryData.ledgerRecord}
+            ledgerData={paymentEntryData.ledgerData}
             propertyFees={paymentEntryData.propertyFees}
             feeCharged={paymentEntryData.feeCharged}
             defaultCheckDate={paymentEntryData.defaultCheckDate}

@@ -41,7 +41,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
     const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
-    console.log('====> LedgerEntry, dueRent', dueRent, unit, unit.rent_amount);
+
     const calcTotalDue = () => {
         let total = 1 * dueRent;
         FEES.forEach(feeObj => {
