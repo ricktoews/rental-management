@@ -1,3 +1,5 @@
+import { MONTH_NAMES } from "../config/constants";
+
 export const format$ = amt => {
     const raw = parseFloat(amt);
     const formatted = raw.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -22,3 +24,11 @@ export function getFirstDayOfNextMonth() {
 
     return `${year}-${month}-${day}`;
 }
+
+export const generateMonthOptions = () => {
+    // Generate options starting from the next month
+    return MONTH_NAMES.map((month, index) => {
+        return <option key={index} value={index + 1}>{month}</option>;
+    });
+};
+

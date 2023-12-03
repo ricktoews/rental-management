@@ -94,7 +94,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }, []);
 
     useEffect(() => {
-        console.log('====> ledger data changed', ledgerData);
+        console.log('====> ledger data changed; check number', ledgerData.check_number, 'data', ledgerData);
         if (typeof ledgerData === 'object' && Object.keys(ledgerData).length > 0) {
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
@@ -278,11 +278,11 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 <td></td>
 
                 {/* Check amount received this month (should match total due this month) */}
-                <td><b>Check amount</b> $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} defaultValue={checkAmount} /></td>
+                <td><b>Check amount</b> $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
 
-                <td><b>Check #</b> <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} defaultValue={checkNumber} /></td>
+                <td><b>Check #</b> <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
 
-                <td><b>Date</b> <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} defaultValue={checkDate} /></td>
+                <td><b>Date</b> <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
 
                 <td></td>
                 <td></td>

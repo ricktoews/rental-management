@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTenants, getProperties, getPaymentEntryData } from '../utils/apis';
 import LedgerEntry from './LedgerEntry';
+import { generateMonthOptions } from '../utils/helpers';
 import styled from 'styled-components';
 
 const PropertyButton = styled.div`
@@ -24,6 +25,7 @@ const Properties = () => {
   const [filteredTenants, setFilteredTenants] = useState([]);
   const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
   const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
+  const [tenantId, setTenantId] = useState(-1);
   const [ledgerRecord, setLedgerRecord] = useState({});
   const [paymentEntryData, setPaymentEntryData] = useState({});
   const navigate = useNavigate();
@@ -47,6 +49,9 @@ const Properties = () => {
     navigate(`/property/edit/${propertyId}`);
   };
 
+
+
+
   const handleTenantSearch = event => {
     const el = event.currentTarget;
     const value = el.value || '';
@@ -57,12 +62,12 @@ const Properties = () => {
     }
   }
 
-  const handleTenantClick = event => {
-    const el = event.currentTarget;
-    const tenantId = el.dataset.id;
-    getPaymentEntryData(tenantId, ledgerMonth)
+  const updatePaymentEntryData = (tenantId, month) => {
+    getPaymentEntryData(tenantId, month)
       .then(res => {
+        console.log('====> res', res);
         tenantDropdownRef.current.style.display = 'none';
+        const due_fees = Object.keys(res.due_fees).length > 0 ? res.due_fees : res.unit_fees;
         setPaymentEntryData({
           unit: { unit_id: res.unit_id, unit_number: res.unit_number, unit_fees: res.unit_fees, rent_amount: res.unit_rent, tenant_id: res.tenant_id, last_name: res.last_name, first_name: res.first_name },
           ledgerMonth: res.ledger_month,
@@ -72,15 +77,31 @@ const Properties = () => {
             check_date: res.check_date,
             ledger_id: res.ledger_id,
             ledger_month: res.ledger_month,
-            due_fees: res.due_fees,
+            due_fees,
             due_rent: res.due_rent,
             paid_fees: res.paid_fees,
             paid_rent: res.paid_rent,
             tenant_id: res.tenant_id
           },
           propertyFees: res.property_fees,
+          tenant_id: res.tenant_id
         })
       });
+
+  }
+
+  const handleTenantClick = event => {
+    const el = event.currentTarget;
+    const id = el.dataset.id;
+    setTenantId(id);
+    updatePaymentEntryData(id, ledgerMonth);
+  }
+
+  const handleMonthChange = event => {
+    const month = event.target.value;
+    console.log('====> fired handleMonthChange', month);
+    setLedgerMonth(month);
+    updatePaymentEntryData(tenantId, month);
 
   }
 
@@ -92,6 +113,18 @@ const Properties = () => {
     <div className="rental-home">
 
       <div style={{ position: 'relative' }} className="tenant-dropdown-container">
+        {/* Payment Month Dropdown */}
+        <div className="month-selector">
+          <label htmlFor="ledgerMonth">Payment Month:</label>
+          <select
+            id="ledgerMonth"
+            value={ledgerMonth}
+            onChange={handleMonthChange}
+          >
+            {generateMonthOptions()}
+          </select>
+        </div>
+
         <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} />
         <div ref={tenantDropdownRef} style={{ display: 'none', position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
           {filteredTenants.map((item, key) => {
@@ -99,7 +132,7 @@ const Properties = () => {
           })}
         </div>
         {/* Units Table */}
-        {paymentEntryData.ledgerMonth && <table className="unit-payments table table-striped">
+        {paymentEntryData.tenant_id && <table className="unit-payments table table-striped">
           <LedgerEntry
             unit={paymentEntryData.unit}
             month={paymentEntryData.ledgerMonth}

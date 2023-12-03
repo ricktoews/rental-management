@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
-import { format$, getFirstDayOfNextMonth } from '../utils/helpers';
+import { format$, getFirstDayOfNextMonth, generateMonthOptions } from '../utils/helpers';
 import LedgerEntry from './LedgerEntry';
-import { FEES, MONTH_NAMES } from '../config/constants';
+import { FEES } from '../config/constants';
 
 const CenteredTh = styled.th`
     text-align: center;
@@ -115,13 +115,6 @@ function PropertyEdit() {
                 });
         }
     }, [ledgerMonth, units])
-
-    const generateMonthOptions = () => {
-        // Generate options starting from the next month
-        return MONTH_NAMES.map((month, index) => {
-            return <option key={index} value={index + 1}>{month}</option>;
-        });
-    };
 
     const handleFeeChange = e => {
         const field = e.currentTarget;
