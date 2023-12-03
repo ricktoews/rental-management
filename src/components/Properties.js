@@ -65,7 +65,7 @@ const Properties = () => {
   const updatePaymentEntryData = (tenantId, month) => {
     getPaymentEntryData(tenantId, month)
       .then(res => {
-        console.log('====> res', res);
+        //        console.log('====> res', res);
         tenantDropdownRef.current.style.display = 'none';
         const due_fees = Object.keys(res.due_fees).length > 0 ? res.due_fees : res.unit_fees;
         setPaymentEntryData({
@@ -99,7 +99,6 @@ const Properties = () => {
 
   const handleMonthChange = event => {
     const month = event.target.value;
-    console.log('====> fired handleMonthChange', month);
     setLedgerMonth(month);
     updatePaymentEntryData(tenantId, month);
 

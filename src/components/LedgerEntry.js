@@ -53,10 +53,10 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }
 
     const calcTotalPaid = () => {
-        let total = paidRent;
+        let total = 1 * paidRent;
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
-            total += 1 * paidFees[feeKey];
+            total += (paidFees.hasOwnProperty(feeKey) ? 1 * paidFees[feeKey] : 0);
         })
         //        console.log('====> calcTotalPaid paidFees', paidFees);
         //        const total = (1 * rent + 1 * scep + 1 * rfd + 1 * trash + 1 * parking).toFixed(2);
@@ -90,6 +90,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         setPaidFees(due);
         setTotalDue(_totalDue);
         setTotalPaid(0);
+        console.log('====> setting check amount to', _totalDue);
         setCheckAmount(_totalDue);
     }, []);
 
@@ -115,9 +116,11 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
             setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(ledgerData.check_number);
+            console.log('====> setting check amount to', ledgerData.check_amount);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
             setTotalDue(_totalDue);
+            console.log('====> set total paid to _totalPaid', _totalPaid);
             setTotalPaid(_totalPaid);
             setLedgerDataEntered(true);
         } else {
@@ -136,9 +139,10 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }, [checkDataUpdate]);
 
     const handleSaveLedger = () => {
-        if (!checkNumber) return;
+        if (!checkNumber || !checkAmount) return;
 
-        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
+        console.log('====> handleSaveLedger checkAmount', checkAmount);
+        //        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
         const payload = {
             tenant_id,
             ledger_month: month,
@@ -201,6 +205,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const handleCheckAmount = e => {
         const el = e.currentTarget;
         setIsDirty(true);
+        console.log('====> setting check amount to', el.value);
         setCheckAmount(el.value);
 
         if (el.value == totalDue) {
