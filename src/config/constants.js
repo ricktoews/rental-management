@@ -10,13 +10,15 @@ export const REST = {
     getPayments: API_BASE + '/get-payments',
     getPaymentEntryData: API_BASE + '/payment-entry',
     getLedgerCard: API_BASE + '/ledger-card/',
+    getRentRecap: API_BASE + '/rent-recap',
 };
 
 export const FEES = [
     { 'scep': 'SCEP' },
     { 'rfd': 'RFD' },
     { 'trash': 'Trash' },
-    { 'parking': 'Parking' }
+    { 'parking': 'Parking' },
+    { 'cap_imp': 'Cap Imp' }
 ]
 
 export const MONTH_NAMES = [

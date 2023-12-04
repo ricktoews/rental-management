@@ -7,6 +7,7 @@ import PropertyEdit from './components/PropertyEdit';
 import Properties from './components/Properties';
 import PropertyDropdown from './components/PropertyDropdown';
 import LedgerCard from './components/LedgerCard';
+import RentRecap from './components/RentRecap';
 
 function App() {
   const [menuState, setMenuState] = useState(false);
@@ -94,6 +95,7 @@ function App() {
             <Route path="/" element={<Properties />} />
             <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
             <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
+            <Route path="/rent-recap/:propertyId/:ledgerMonth" element={<RentRecap />} />
             <Route path="/properties" element={<PropertyDropdown />} />
           </Routes>
         </div>

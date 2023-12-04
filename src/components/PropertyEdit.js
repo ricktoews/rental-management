@@ -57,6 +57,7 @@ const StyledLabel = styled.label`
 function PropertyEdit() {
     let { propertyId } = useParams();
     const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
+    const recapMonth = (new Date().getMonth()) % 12 + 1;
     const [address, setAddress] = useState('');
     const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
@@ -129,7 +130,8 @@ function PropertyEdit() {
             <Link to="/">Return to Property List</Link>
 
             <h2>{address}</h2>
-
+            <Link to={`/rent-recap/${propertyId}/${recapMonth}`}>Rent Recap</Link>
+            <hr />
             {/* Property Fees Table */}
             <PropertyTable className="property-fees table">
                 <thead>
