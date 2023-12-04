@@ -90,12 +90,11 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         setPaidFees(due);
         setTotalDue(_totalDue);
         setTotalPaid(0);
-        console.log('====> setting check amount to', _totalDue);
         setCheckAmount(_totalDue);
     }, []);
 
     useEffect(() => {
-        console.log('====> ledger data changed; check number', ledgerData.check_number, 'data', ledgerData);
+        console.log('====> ledger data changed; check number', ledgerData?.check_number, 'data', ledgerData);
         if (typeof ledgerData === 'object' && Object.keys(ledgerData).length > 0) {
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
@@ -116,7 +115,6 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
             setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(ledgerData.check_number);
-            console.log('====> setting check amount to', ledgerData.check_amount);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
             setTotalDue(_totalDue);
@@ -315,7 +313,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
 
                 <td>{totalPaid > 0 && `Total paid: ${format$(totalPaid)}` || null}</td>
 
-                <td></td>
+                <td>Balance: $-10</td>
                 <td></td>
                 <td></td>
             </tr>
