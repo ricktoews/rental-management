@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getFirstDayOfNextMonth } from "../utils/helpers";
 import { saveLedgerEntry } from '../utils/apis';
@@ -249,7 +250,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         <tbody className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
             <tr>
                 <td>Unit {unit.unit_number}</td>
-                <td colSpan={8}>Tenant: {unit.first_name} {unit.last_name}</td>
+                <td colSpan={8}>Tenant: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link></td>
             </tr>
             <tr data-unit_id={unit.unit_id}>
                 <td></td>

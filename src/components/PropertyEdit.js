@@ -57,9 +57,10 @@ const StyledLabel = styled.label`
 function PropertyEdit() {
     let { propertyId } = useParams();
     const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
-    const recapMonth = (new Date().getMonth()) % 12 + 1;
+    const lastMonth = (new Date().getMonth()) % 12 + 1;
     const [address, setAddress] = useState('');
     const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
+    const [recapMonth, setRecapMonth] = useState(lastMonth);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
     const [propertyFees, setPropertyFees] = useState({});
     const [feeCharged, setFeeCharged] = useState({});
@@ -125,11 +126,30 @@ function PropertyEdit() {
         setTriggerSave(true);
     }
 
+    const handleMonthChange = event => {
+        const month = event.target.value;
+        setRecapMonth(month);
+    }
+
     return (
         <div>
             <Link to="/">Return to Property List</Link>
 
             <h2>{address}</h2>
+
+            {/* Payment Month Dropdown */}
+            <div className="month-selector">
+                <label htmlFor="recapMonth">Recap Month:</label>
+                <select
+                    id="recapMonth"
+                    value={recapMonth}
+                    onChange={handleMonthChange}
+                >
+                    {generateMonthOptions()}
+                </select>
+            </div>
+
+
             <Link to={`/rent-recap/${propertyId}/${recapMonth}`}>Rent Recap</Link>
             <hr />
             {/* Property Fees Table */}

@@ -8,6 +8,7 @@ import Properties from './components/Properties';
 import PropertyDropdown from './components/PropertyDropdown';
 import LedgerCard from './components/LedgerCard';
 import RentRecap from './components/RentRecap';
+import TenantDetails from './components/TenantDetails';
 
 function App() {
   const [menuState, setMenuState] = useState(false);
@@ -97,6 +98,7 @@ function App() {
             <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
             <Route path="/rent-recap/:propertyId/:ledgerMonth" element={<RentRecap />} />
             <Route path="/properties" element={<PropertyDropdown />} />
+            <Route path="/tenant-details/:tenant_id" element={<TenantDetails />} />
           </Routes>
         </div>
       </div>
