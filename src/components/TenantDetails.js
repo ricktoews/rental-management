@@ -9,6 +9,7 @@ const TenantDetails = () => {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [balance, setBalance] = useState(0);
 
     useEffect(() => {
         getTenants()
@@ -49,6 +50,11 @@ const TenantDetails = () => {
                         <td>Phone</td>
                         <td><input type="text" onChange={handleChange} value={phone} /></td>
                     </tr>
+                    <tr>
+                        <td>Balance</td>
+                        <td><input type="text" onChange={handleChange} value={balance} /></td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>
