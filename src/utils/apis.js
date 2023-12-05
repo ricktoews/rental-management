@@ -15,6 +15,41 @@ export const getTenants = async () => {
     }
 }
 
+export const getTenant = async (tenantId) => {
+    try {
+        const response = await fetch(`${REST.getTenant}/${tenantId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("There was a problem fetching the tenant:", error);
+        throw error;  // or return some default/fallback data if desired
+    }
+}
+
+export const saveTenant = async (tenantId, details) => {
+    try {
+        const response = await fetch(`${REST.saveTenant}/${tenantId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(details),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
 
 // Assuming REST is an object with a 'properties' key holding the URL
 export const getProperties = async () => {
@@ -189,5 +224,5 @@ export const getRentRecap = async (property_id, ledger_month) => {
         console.error('There was a problem with the fetch operation:', error);
         throw error; // Re-throwing the error to allow handling it at the call site
     }
-
 }
+

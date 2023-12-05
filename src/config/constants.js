@@ -2,6 +2,8 @@ export const API_BASE = 'https://www.toews-api.com';
 
 export const REST = {
     tenants: API_BASE + '/tenant',
+    getTenant: API_BASE + '/tenant',
+    saveTenant: API_BASE + '/tenant',
     properties: API_BASE + '/property',
     propertyById: API_BASE + '/property/',
     saveProperty: API_BASE + '/property/',
