@@ -97,6 +97,11 @@ const Properties = () => {
     updatePaymentEntryData(id, ledgerMonth);
   }
 
+  const handleAddTenantButton = event => {
+    console.log('====> Add Tenant');
+    navigate('/tenant-details/new');
+  }
+
   const handleMonthChange = event => {
     const month = event.target.value;
     setLedgerMonth(month);
@@ -124,7 +129,8 @@ const Properties = () => {
           </select>
         </div>
 
-        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} />
+        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} /> <button onClick={handleAddTenantButton} className="btn btn-warning">+</button>
+
         <div ref={tenantDropdownRef} style={{ display: 'none', position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
           {filteredTenants.map((item, key) => {
             return <div key={key} data-id={item.tenant_id} onClick={handleTenantClick} style={{ cursor: 'pointer', borderBottom: '1px solid #ccc' }}>{item.last_name}, {item.first_name}</div>

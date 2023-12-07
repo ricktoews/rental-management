@@ -1,5 +1,19 @@
 import { REST } from '../config/constants';
 
+export const getUnoccupiedUnits = async () => {
+    try {
+        const response = await fetch(REST.unoccupiedUnits);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("There was a problem fetching the unoccupied units:", error);
+        throw error;  // or return some default/fallback data if desired
+    }
+}
+
 export const getTenants = async () => {
     try {
         const response = await fetch(REST.tenants);
@@ -30,9 +44,18 @@ export const getTenant = async (tenantId) => {
 }
 
 export const saveTenant = async (tenantId, details) => {
+    let url;
+    let method;
+    if (tenantId === 'new') {
+        url = REST.saveTenant;
+        method = 'POST';
+    } else {
+        url = `${REST.saveTenant}/${tenantId}`;
+        method = 'PUT';
+    }
     try {
-        const response = await fetch(`${REST.saveTenant}/${tenantId}`, {
-            method: 'PUT',
+        const response = await fetch(url, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -50,6 +73,47 @@ export const saveTenant = async (tenantId, details) => {
         throw error; // Re-throwing the error to allow handling it at the call site
     }
 }
+
+export const moveIn = async (tenantId, unitId) => {
+    try {
+        const response = await fetch(`${REST.moveIn}/${tenantId}/${unitId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('There was a problem moving in the tenant', error);
+        throw error;
+    }
+}
+
+export const moveOut = async (tenantId) => {
+    try {
+        const response = await fetch(`${REST.moveOut}/${tenantId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('There was a problem moving in the tenant', error);
+        throw error;
+    }
+}
+
 
 // Assuming REST is an object with a 'properties' key holding the URL
 export const getProperties = async () => {

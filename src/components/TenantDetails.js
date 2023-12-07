@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTenant, getTenants, saveTenant } from '../utils/apis';
+import { getTenant, getUnoccupiedUnits, saveTenant, moveIn, moveOut } from '../utils/apis';
 
 const TenantDetails = () => {
     const { tenant_id } = useParams();
@@ -11,12 +11,19 @@ const TenantDetails = () => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [startingBalance, setStartingBalance] = useState(0);
+    const [unitId, setUnitId] = useState();
+    const [vacantUnits, setVacantUnits] = useState([]);
+
+    const unitSelectionRef = useRef();
 
     useEffect(() => {
+        if (tenant_id === 'new') return;
+
         getTenant(tenant_id)
             .then(res => {
                 const tenantData = res;
                 console.log('====> tenant', tenant_id, tenantData);
+                setUnitId(tenantData.unit_id);
                 setAddress(tenantData.address || '');
                 setUnitNumber(tenantData.unit_number);
                 setFirstName(tenantData.first_name);
@@ -24,8 +31,25 @@ const TenantDetails = () => {
                 setEmail(tenantData.email || '');
                 setPhone(tenantData.phone || '');
                 setStartingBalance(tenantData.starting_balance || 0);
+
+                getUnoccupiedUnits().then(res => {
+                    console.log('====> Unoccupied units', res);
+                    setVacantUnits(res);
+                })
             })
     }, []);
+
+    const saveTenantDetails = async () => {
+        const details = {
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            phone,
+            starting_balance: startingBalance
+        };
+        console.log('====> saveTenantDetails', tenant_id, details);
+        const result = await saveTenant(tenant_id, details);
+    }
 
     const handleChange = e => {
         const el = e.currentTarget;
@@ -50,14 +74,36 @@ const TenantDetails = () => {
     }
 
     const handleButton = async e => {
-        const details = {
-            first_name: firstName,
-            last_name: lastName,
-            email,
-            phone,
-            starting_balance: startingBalance
-        };
-        const result = await saveTenant(tenant_id, details);
+        saveTenantDetails();
+        /*
+                const details = {
+                    first_name: firstName,
+                    last_name: lastName,
+                    email,
+                    phone,
+                    starting_balance: startingBalance
+                };
+                console.log('====> handleButton', tenant_id, details);
+                const result = await saveTenant(tenant_id, details);
+        */
+    }
+
+    const handleMoveIn = async e => {
+        const selectedUnit = unitSelectionRef.current;
+        setUnitId(selectedUnit.value);
+        console.log('====> Move In', selectedUnit.value)
+        moveIn(tenant_id, selectedUnit.value);
+    }
+
+    const handleMoveOut = async e => {
+        console.log('====> Move Out');
+        setUnitId();
+        moveOut(tenant_id);
+    }
+
+    const handleSelectUnitId = async e => {
+        const el = e.currentTarget;
+        console.log('====> select unit', el.value, el);
     }
 
     return (
@@ -65,9 +111,20 @@ const TenantDetails = () => {
             <h2>Tenant Details</h2>
             <table>
                 <tbody>
-                    <tr>
-                        <td>Address, Unit</td><td>{address}, {unitNumber}</td>
-                    </tr>
+                    {!unitNumber ?
+                        (<tr>
+                            <td>Address, Unit</td>
+                            <td><select ref={unitSelectionRef}>
+                                {vacantUnits.map((item, key) => <option key={key} value={item.unit_id}>{item.address}, {item.unit_number}</option>)}
+                            </select>
+                                <button className="btn" onClick={handleMoveIn}>Move In</button>
+                            </td>
+                        </tr>) :
+                        (<tr>
+                            <td>Address, Unit</td>
+                            <td>{address}, {unitNumber} <button className="btn" onClick={handleMoveOut}>Move Out</button></td>
+                        </tr>)
+                    }
                     <tr>
                         <td>First name</td>
                         <td><input type="text" data-field="firstName" onChange={handleChange} value={firstName} /></td>
