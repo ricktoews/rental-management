@@ -61,7 +61,7 @@ function RentRecap() {
                                 <td>{entry.check_number}</td>
                                 <td>{entry.check_date}</td>
                                 <td>{entry.check_amount}</td>
-                                <td>{balance}</td>
+                                <td>{entry.balance}</td>
                             </tr>
                         )
                     })}

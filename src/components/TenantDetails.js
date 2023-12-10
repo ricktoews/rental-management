@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTenant, getUnoccupiedUnits, saveTenant, moveIn, moveOut } from '../utils/apis';
+import { FEES } from "../config/constants";
 
 const TenantDetails = () => {
     const { tenant_id } = useParams();
@@ -10,6 +11,8 @@ const TenantDetails = () => {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [rent, setRent] = useState(0);
+    const [fees, setFees] = useState({});
     const [startingBalance, setStartingBalance] = useState(0);
     const [unitId, setUnitId] = useState();
     const [vacantUnits, setVacantUnits] = useState([]);
@@ -22,6 +25,7 @@ const TenantDetails = () => {
         getTenant(tenant_id)
             .then(res => {
                 const tenantData = res;
+                //                const due = getFeesForUnit(tenantData.monthly_fees);
                 console.log('====> tenant', tenant_id, tenantData);
                 setUnitId(tenantData.unit_id);
                 setAddress(tenantData.address || '');
@@ -30,6 +34,8 @@ const TenantDetails = () => {
                 setLastName(tenantData.last_name);
                 setEmail(tenantData.email || '');
                 setPhone(tenantData.phone || '');
+                setRent(tenantData.rent_amount || 0);
+                setFees(tenantData.monthly_fees || {});
                 setStartingBalance(tenantData.starting_balance || 0);
 
                 getUnoccupiedUnits().then(res => {
@@ -39,12 +45,24 @@ const TenantDetails = () => {
             })
     }, []);
 
+    const getFeesForUnit = (fee_data = {}) => {
+        const due = {};
+        FEES.forEach(feeObj => {
+            const fee = Object.keys(feeObj)[0];
+            due[fee] = fee_data[fee] || 0;
+        });
+        return due;
+    }
+
+
     const saveTenantDetails = async () => {
         const details = {
             first_name: firstName,
             last_name: lastName,
             email,
             phone,
+            rent_amount: rent,
+            monthly_fees: JSON.stringify(fees),
             starting_balance: startingBalance
         };
         console.log('====> saveTenantDetails', tenant_id, details);
@@ -68,9 +86,21 @@ const TenantDetails = () => {
             case 'phone':
                 setPhone(value);
                 break;
+            case 'rent':
+                setRent(value);
+                break;
             case 'startingBalance':
                 setStartingBalance(1 * value);
         }
+    }
+
+    const handleFeeChange = e => {
+        const el = e.currentTarget;
+        const feeKey = el.dataset.monthly;
+        const value = el.value;
+        const updatedFees = { ...fees };
+        updatedFees[feeKey] = value;
+        setFees(updatedFees);
     }
 
     const handleButton = async e => {
@@ -99,11 +129,6 @@ const TenantDetails = () => {
         console.log('====> Move Out');
         setUnitId();
         moveOut(tenant_id);
-    }
-
-    const handleSelectUnitId = async e => {
-        const el = e.currentTarget;
-        console.log('====> select unit', el.value, el);
     }
 
     return (
@@ -141,6 +166,18 @@ const TenantDetails = () => {
                         <td>Phone</td>
                         <td><input type="text" data-field="phone" onChange={handleChange} value={phone} /></td>
                     </tr>
+                    <tr>
+                        <td>Monthly Rent</td>
+                        <td><input type="text" data-field="rent" onChange={handleChange} value={rent} /></td>
+                    </tr>
+
+                    {FEES.map((feeObj, key) => {
+                        const feeKey = Object.keys(feeObj)[0];
+                        const feeValue = Object.values(feeObj)[0];
+
+                        return <tr key={key}><td>{feeValue} $</td><td><input data-monthly={feeKey} onChange={handleFeeChange} value={fees[feeKey] || ''} /></td></tr>
+                    })}
+
                     <tr>
                         <td>Balance</td>
                         <td><input type="text" data-field="startingBalance" onChange={handleChange} value={startingBalance} /></td>

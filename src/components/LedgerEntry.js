@@ -257,13 +257,13 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
                 {/* These amounts should default to values from units but saved to ledger table. */}
 
                 {/* Rent due this month */}
-                <td>Due this month:  <b>Rent</b> $<input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} /></td>
+                <td>Due this month:  <b>Rent</b> ${dueRent} {/*<input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} />*/}</td>
 
                 {FEES.map((feeObj, key) => {
                     const feeKey = Object.keys(feeObj)[0];
                     const feeValue = Object.values(feeObj)[0];
                     if (propertyFees[feeKey] > 0) {
-                        return <td key={key}><b>{feeValue}</b> $<input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} /></td>
+                        return <td key={key}><b>{feeValue}</b> ${dueFees[feeKey]}{/*<input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} />*/}</td>
                     } else {
                         return null;
                     }
