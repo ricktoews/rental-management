@@ -109,7 +109,7 @@ export const moveOut = async (tenantId) => {
 
         return await response.json();
     } catch (error) {
-        console.error('There was a problem moving in the tenant', error);
+        console.error('There was a problem moving outs the tenant', error);
         throw error;
     }
 }
@@ -274,9 +274,9 @@ export const getLedgerCard = async (unit_id) => {
 
 }
 
-export const getRentRecap = async (property_id, ledger_month) => {
+export const getRentRecap = async (property_id, ledger_month, ledger_year) => {
     try {
-        const response = await fetch(`${REST.getRentRecap}/${property_id}/${ledger_month}`);
+        const response = await fetch(`${REST.getRentRecap}/${property_id}/${ledger_month}/${ledger_year}`);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');

@@ -5,15 +5,15 @@ import { processLedgerData } from './LedgerCardUtils.js';
 import { MONTH_NAMES } from '../config/constants';
 
 function RentRecap() {
-    const { propertyId, ledgerMonth } = useParams();
+    const { propertyId, ledgerMonth, ledgerYear } = useParams();
     const [address, setAddress] = useState('');
     const [rentRecapData, setRentRecapData] = useState({});
     let balance = 0;
 
     useEffect(() => {
         // Fetch ledger card data when the component loads
-        if (propertyId && ledgerMonth) {
-            getRentRecap(propertyId, ledgerMonth)
+        if (propertyId && ledgerMonth && ledgerYear) {
+            getRentRecap(propertyId, ledgerMonth, ledgerYear)
                 .then((data) => {
                     console.log('====> Rent Recap data', data);
                     setAddress(data.address);
@@ -23,7 +23,7 @@ function RentRecap() {
                     console.error('Error fetching ledger data:', error);
                 });
         }
-    }, [propertyId, ledgerMonth]);
+    }, [propertyId, ledgerMonth, ledgerYear]);
 
     // Check if ledgerData is empty, and return null if it is
     if (!rentRecapData?.unitData) {

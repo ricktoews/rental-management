@@ -169,7 +169,7 @@ function PropertyEdit() {
             </div>
 
 
-            <Link to={`/rent-recap/${propertyId}/${recapMonth}`}>Rent Recap</Link>
+            <Link to={`/rent-recap/${propertyId}/${recapMonth}/${recapYear}`}>Rent Recap</Link>
             <hr />
             {/* Property Fees Table */}
             <PropertyTable className="property-fees table">
