@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getPropertyById, savePropertyDetails, saveUnitMonthlyFees, setPayment, getPayments } from '../utils/apis';
-import { format$, getFirstDayOfNextMonth, generateMonthOptions } from '../utils/helpers';
+import { format$, getFirstDayOfNextMonth, generateMonthOptions, generateYearOptions } from '../utils/helpers';
 import LedgerEntry from './LedgerEntry';
 import { FEES } from '../config/constants';
 
@@ -56,11 +56,16 @@ const StyledLabel = styled.label`
 
 function PropertyEdit() {
     let { propertyId } = useParams();
+    const currentMonth = (new Date().getMonth() + 1);
     const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
+    const currentYear = new Date().getFullYear();
+    const nextYear = new Date().getFullYear() + 1;
     const _recapMonth = (new Date().getMonth()) % 12 + 1;
     const [address, setAddress] = useState('');
     const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
+    const [ledgerYear, setLedgerYear] = useState(nextMonth < currentMonth ? nextYear : currentYear);
     const [recapMonth, setRecapMonth] = useState(_recapMonth);
+    const [recapYear, setRecapYear] = useState(currentYear);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
     const [propertyFees, setPropertyFees] = useState({});
     const [feeCharged, setFeeCharged] = useState({});
@@ -131,6 +136,11 @@ function PropertyEdit() {
         setRecapMonth(month);
     }
 
+    const handleYearChange = event => {
+        const month = event.target.value;
+        setRecapYear(month);
+    }
+
     return (
         <div>
             <Link to="/">Return to Property List</Link>
@@ -139,7 +149,7 @@ function PropertyEdit() {
 
             {/* Payment Month Dropdown */}
             <div className="month-selector">
-                <label htmlFor="recapMonth">Payment Month:</label>
+                <label htmlFor="recapMonth">Recap Month:</label>
                 <select
                     id="recapMonth"
                     value={recapMonth}
@@ -147,6 +157,15 @@ function PropertyEdit() {
                 >
                     {generateMonthOptions()}
                 </select>
+                <label htmlFor="recapYear">Year:</label>
+                <select
+                    id="recapYear"
+                    value={recapYear}
+                    onChange={handleYearChange}
+                >
+                    {generateYearOptions()}
+                </select>
+
             </div>
 
 
@@ -183,6 +202,15 @@ function PropertyEdit() {
                 >
                     {generateMonthOptions()}
                 </select>
+                <label htmlFor="ledgerMonth">Year:</label>
+                <select
+                    id="ledgerYear"
+                    value={ledgerYear}
+                    onChange={(e) => setLedgerYear(e.target.value)}
+                >
+                    {generateYearOptions()}
+                </select>
+
             </div>
 
             {/* Units Table */}
@@ -192,10 +220,11 @@ function PropertyEdit() {
                     return <LedgerEntry key={idx}
                         unit={unit}
                         month={ledgerMonth}
+                        ledgerMonth={ledgerMonth}
+                        ledgerYear={ledgerYear}
                         ledgerData={ledgerRecord}
                         propertyFees={propertyFees}
                         feeCharged={feeCharged}
-                        defaultCheckDate={defaultCheckDate}
                         propertyMonthlyTotal={propertyMonthlyTotal}
                         paymentsReceivedTotal={paymentsReceivedTotal}
                     />;

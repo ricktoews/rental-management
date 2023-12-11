@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
-import { format$, getFirstDayOfNextMonth } from "../utils/helpers";
+import { format$, getDefaultCheckDate, getFirstDayOfNextMonth } from "../utils/helpers";
 import { saveLedgerEntry } from '../utils/apis';
 import { FEES } from "../config/constants";
 
@@ -28,14 +28,15 @@ const Money = styled.td`
 text-align: right;
 `;
 
-function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaultCheckDate, propertyMonthlyTotal, paymentsReceivedTotal }) {
+function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, propertyFees, propertyMonthlyTotal, paymentsReceivedTotal }) {
+    const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
     const [dueRent, setDueRent] = useState(unit.rent_amount);
     const [dueFees, setDueFees] = useState({});
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
     const [paidFees, setPaidFees] = useState({});
     const [checkAmount, setCheckAmount] = useState(ledgerData?.check_amount || '');
     const [checkNumber, setCheckNumber] = useState(ledgerData?.check_number || '');
-    const [checkDate, setCheckDate] = useState(ledgerData?.check_date || getFirstDayOfNextMonth());
+    const [checkDate, setCheckDate] = useState(defaultCheckDate);
     const [checkDataUpdate, setCheckDataUpdate] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
     const [totalDue, setTotalDue] = useState('');
@@ -94,7 +95,6 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }, []);
 
     useEffect(() => {
-        console.log('====> ledger data changed; check number', ledgerData?.check_number, 'data', ledgerData);
         if (typeof ledgerData === 'object' && Object.keys(ledgerData).length > 0) {
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
@@ -128,6 +128,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     }, [ledgerData])
 
     useEffect(() => {
+        console.log('====> checkDataUpdate');
         if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
             console.log('====> Check information', checkAmount, checkNumber, checkDate);
             handleSaveLedger();
@@ -143,7 +144,8 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         //        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
         const payload = {
             tenant_id,
-            ledger_month: month,
+            ledger_month: ledgerMonth,
+            ledger_year: ledgerYear,
             check_number: checkNumber,
             check_amount: 1 * checkAmount,
             check_date: checkDate,
@@ -155,21 +157,6 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
         };
         console.log('====> handleSaveLedger', payload);
         saveLedgerEntry(payload);
-    }
-
-    const handleDueRent = e => {
-        const el = e.currentTarget;
-        setIsDirty(true);
-        setDueRent(el.value);
-    }
-
-    const handleDueFees = e => {
-        const el = e.currentTarget;
-        const due = el.value;
-        const feeKey = el.dataset.monthly;
-        setIsDirty(true);
-        setDueFees({ ...dueFees, [feeKey]: due });
-        //console.log('====> handleDueFees, fee', due, feeKey);
     }
 
     const handlePaidFees = e => {
@@ -246,6 +233,7 @@ function LedgerEntry({ unit, month, ledgerData, feeCharged, propertyFees, defaul
     const tenant_id = unit.tenant_id;
 
     const style = { color: 'green' };
+
     return (
         <tbody className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
             <tr>

@@ -6,6 +6,12 @@ export const format$ = amt => {
     return formatted;
 }
 
+export function getDefaultCheckDate(year, month) {
+    const checkDate = new Date(year, month - 1, 1);
+    const fmtCheckDate = checkDate.toISOString().substring(0, 10);
+    return fmtCheckDate;
+}
+
 export function getFirstDayOfNextMonth() {
     // Get the current date
     const currentDate = new Date();
@@ -29,6 +35,20 @@ export const generateMonthOptions = () => {
     // Generate options starting from the next month
     return MONTH_NAMES.map((month, index) => {
         return <option key={index} value={index + 1}>{month}</option>;
+    });
+};
+
+export const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const startingYear = 2023;
+    const YEARS = [];
+    for (let year = startingYear; year <= currentYear + 1; year++) {
+        YEARS.push(year);
+    }
+    // Generate options starting from the next month
+    return YEARS.map((year, index) => {
+        const selected = (year === currentYear) ? 'selected' : '';
+        return <option key={index} value={year}>{year}</option>;
     });
 };
 
