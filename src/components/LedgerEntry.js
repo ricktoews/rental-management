@@ -238,7 +238,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
         <tbody className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
             <tr>
                 <td>Unit {unit.unit_number}</td>
-                <td colSpan={8}>Tenant: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link></td>
+                <td colSpan={8}>Tenant: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link> <Link to={`/ledger-card/${unit.tenant_id}`}>Ledger Card</Link></td>
             </tr>
             <tr data-unit_id={unit.unit_id}>
                 <td></td>

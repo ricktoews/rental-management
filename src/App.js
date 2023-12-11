@@ -95,7 +95,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Properties />} />
             <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
-            <Route path="/ledger-card/:unitId" element={<LedgerCard />} />
+            <Route path="/ledger-card/:tenantId" element={<LedgerCard />} />
             <Route path="/rent-recap/:propertyId/:ledgerMonth/:ledgerYear" element={<RentRecap />} />
             <Route path="/properties" element={<PropertyDropdown />} />
             <Route path="/tenant-details/:tenant_id" element={<TenantDetails />} />
