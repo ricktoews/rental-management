@@ -60,7 +60,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
             total += (paidFees.hasOwnProperty(feeKey) ? 1 * paidFees[feeKey] : 0);
         })
         //        console.log('====> calcTotalPaid paidFees', paidFees);
-        //        const total = (1 * rent + 1 * scep + 1 * rfd + 1 * trash + 1 * parking).toFixed(2);
+        //        const total = (1 * rent + 1 * scep + 1 * rsd + 1 * trash + 1 * parking).toFixed(2);
         setTotalPaid(total);
         setCheckAmount(total);
     }
@@ -177,7 +177,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
     }
 
 
-    // I don't like this. It's a serious pain to have to deal with each breakdown (SCEP, RFD, &c.) in each place.
+    // I don't like this. It's a serious pain to have to deal with each breakdown (SCEP, RSD, &c.) in each place.
     const fillInCheckDisbursement = () => {
         setPaidRent(dueRent);
         setPaidFees(dueFees);

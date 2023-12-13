@@ -20,7 +20,7 @@ export const REST = {
 
 export const FEES = [
     { 'scep': 'SCEP' },
-    { 'rfd': 'RFD' },
+    { 'rsd': 'RSD' },
     { 'trash': 'Trash' },
     { 'parking': 'Parking' },
     { 'cap_imp': 'Cap Imp' }
