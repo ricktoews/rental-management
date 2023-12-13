@@ -7,8 +7,11 @@ export const format$ = amt => {
 }
 
 export function getDefaultCheckDate(year, month) {
+	let fmtCheckDate = '';
+	if (year === undefined || month === undefined) return fmtCheckDate;
+
     const checkDate = new Date(year, month - 1, 1);
-    const fmtCheckDate = checkDate.toISOString().substring(0, 10);
+    fmtCheckDate = checkDate.toISOString().substring(0, 10);
     return fmtCheckDate;
 }
 
