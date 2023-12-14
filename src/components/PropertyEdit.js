@@ -80,11 +80,12 @@ function PropertyEdit() {
         if (propertyId) {
             getPropertyById(propertyId)
                 .then(res => {
+                    console.log('====> property by ID', propertyId, res);
                     const propertyFees = res.property_fees || {};
                     setAddress(res.property_address);
                     setPropertyFees(propertyFees);
                     setUnits(res.units);
-
+/*
                     const _feeCharged = {};
                     Object.keys(propertyFees).forEach(item => {
                         if (res.property_fees[item]) {
@@ -100,6 +101,7 @@ function PropertyEdit() {
                         });
                     })
                     setFeeCharged(_feeCharged);
+                    */
                 })
         }
     }, [propertyId]);
@@ -117,7 +119,7 @@ function PropertyEdit() {
         if (tenantIds.length > 0) {
             getPayments(ledgerMonth, tenantIds)
                 .then(res => {
-                    console.log('====> data for month', ledgerMonth, res);
+                    console.log('====> ledgerData for month', ledgerMonth, res);
                     setLedgerData(res);
                 });
         }
@@ -172,6 +174,7 @@ function PropertyEdit() {
             <Link to={`/rent-recap/${propertyId}/${recapMonth}/${recapYear}`}>Rent Recap</Link>
             <hr />
             {/* Property Fees Table */}
+            {/*
             <PropertyTable className="property-fees table">
                 <thead>
                     <tr className="table-success">
@@ -191,7 +194,7 @@ function PropertyEdit() {
                     </tr>
                 </tbody>
             </PropertyTable>
-
+*/}
             {/* Payment Month Dropdown */}
             <div className="month-selector">
                 <label htmlFor="ledgerMonth">Payment Month:</label>
@@ -224,9 +227,6 @@ function PropertyEdit() {
                         ledgerYear={ledgerYear}
                         ledgerData={ledgerRecord}
                         propertyFees={propertyFees}
-                        feeCharged={feeCharged}
-                        propertyMonthlyTotal={propertyMonthlyTotal}
-                        paymentsReceivedTotal={paymentsReceivedTotal}
                     />;
 
                 })}

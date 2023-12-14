@@ -28,9 +28,9 @@ const Money = styled.td`
 text-align: right;
 `;
 
-function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, propertyFees, propertyMonthlyTotal, paymentsReceivedTotal }) {
+function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
-    const [dueRent, setDueRent] = useState(unit.rent_amount);
+    const [dueRent, setDueRent] = useState(unit.tenant_rent_amount);
     const [dueFees, setDueFees] = useState({});
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
     const [paidFees, setPaidFees] = useState({});
@@ -75,16 +75,13 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
     }
 
     useEffect(() => {
-        let due = 0;
-        if (unit.unit_fees) {
-            due = getFeesForUnit(unit.unit_fees);
-        } else {
-            due = getFeesForUnit(propertyFees);
-        }
+        const due = getFeesForUnit(unit.tenant_monthly_fees);
+
         let _totalDue = 1 * dueRent;
+
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
-            _totalDue += (due[feeKey] || 0);
+            _totalDue += (1*due[feeKey] || 0);
         })
         setPaidRent(dueRent);
         setDueFees(due);
@@ -250,7 +247,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
                 {FEES.map((feeObj, key) => {
                     const feeKey = Object.keys(feeObj)[0];
                     const feeValue = Object.values(feeObj)[0];
-                    if (propertyFees[feeKey] > 0) {
+                    if (unit.tenant_monthly_fees[feeKey] > 0) {
                         return <td key={key}><b>{feeValue}</b> ${dueFees[feeKey]}{/*<input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} />*/}</td>
                     } else {
                         return null;
@@ -291,7 +288,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData, feeCharged, pr
                 {FEES.map((feeObj, key) => {
                     const feeKey = Object.keys(feeObj)[0];
                     const feeValue = Object.values(feeObj)[0];
-                    if (propertyFees[feeKey] > 0) {
+                    if (unit.tenant_monthly_fees[feeKey] > 0) {
                         return <td key={key}><b>{feeValue}</b> $<input data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
                     } else {
                         return null;
