@@ -34,6 +34,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const [dueFees, setDueFees] = useState({});
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
     const [lateFee, setLateFee] = useState('');
+    const [ledgerNotes, setLedgerNotes] = useState('');
     const [paidFees, setPaidFees] = useState({});
     const [checkAmount, setCheckAmount] = useState(ledgerData?.check_amount || '');
     const [checkNumber, setCheckNumber] = useState(ledgerData?.check_number || '');
@@ -116,6 +117,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
             setCheckDate(ledgerData.check_date);
             setTotalDue(_totalDue);
             setTotalPaid(_totalPaid);
+            setLedgerNotes(ledgerData.notes);
             setLedgerDataEntered(true);
         } else {
             setCheckNumber('');
@@ -149,7 +151,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
             paid_rent: 1 * paidRent,
             late_fee: 1 * lateFee,
             due_fees: dueFees,
-            paid_fees: paidFees
+            paid_fees: paidFees,
+            notes: ledgerNotes
 
         };
         console.log('====> handleSaveLedger', payload);
@@ -179,6 +182,11 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
         setLateFee(el.value);
     }
 
+    const handleLedgerNotes = e => {
+        const el = e.currentTarget;
+        setIsDirty(true);
+        setLedgerNotes(el.value);
+    }
 
     // I don't like this. It's a serious pain to have to deal with each breakdown (SCEP, RSD, &c.) in each place.
     const fillInCheckDisbursement = () => {
@@ -328,6 +336,14 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
                         </tbody>
                     </table>
 
+                </td>
+            </tr>
+            <tr className="table-success">
+                <td colSpan="3">Notes</td>
+            </tr>
+            <tr>
+                <td colSpan="3">
+                    <textarea onChange={handleLedgerNotes} onBlur={handleSaveIfDirty} value={ledgerNotes} />
                 </td>
             </tr>
         </tbody>

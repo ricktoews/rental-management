@@ -97,6 +97,7 @@ const Properties = () => {
             paid_fees: res.paid_fees,
             paid_rent: res.paid_rent,
             late_fee: res.late_fee,
+            notes: res.notes,
             tenant_id: res.tenant_id
           },
           propertyFees: res.property_fees,

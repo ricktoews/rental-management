@@ -158,7 +158,11 @@ table.property-fees {
   margin-bottom: 20px;
 }
 
-table.unit-payments tr:nth-child(7n) {
+table.unit-payments tr:nth-child(9n) {
+  //border-bottom: 4px solid green;
+}
+
+table.unit-payments tbody.ledger-entry>tr:last-child {
   border-bottom: 4px solid green;
 }
 

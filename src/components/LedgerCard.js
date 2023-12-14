@@ -83,6 +83,14 @@ function LedgerCard() {
                                 <td>{entry.check_number}</td>
                                 <td>{format$(balance2)}</td>
                             </tr>
+                            {entry.notes && (
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td colSpan="4">{entry.notes}</td>
+                                </tr>
+                            )}
                         </tbody>
                     )
                 })}
