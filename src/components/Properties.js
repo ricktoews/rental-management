@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTenants, getProperties, getPaymentEntryData } from '../utils/apis';
 import LedgerEntry from './LedgerEntry';
-import { generateMonthOptions } from '../utils/helpers';
+import { generateMonthOptions, generateYearOptions } from '../utils/helpers';
 import styled from 'styled-components';
 
 const PropertyButton = styled.div`
@@ -20,11 +20,16 @@ const PropertyButton = styled.div`
 `;
 
 const Properties = () => {
+  const currentMonth = (new Date().getMonth() + 1);
+  const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
+  const currentYear = new Date().getFullYear();
+  const nextYear = new Date().getFullYear() + 1;
+
   const [properties, setProperties] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [filteredTenants, setFilteredTenants] = useState([]);
-  const nextMonth = (new Date().getMonth() + 1) % 12 + 1;
   const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
+  const [ledgerYear, setLedgerYear] = useState(nextMonth < currentMonth ? nextYear : currentYear);
   const [tenantId, setTenantId] = useState(-1);
   const [ledgerRecord, setLedgerRecord] = useState({});
   const [paymentEntryData, setPaymentEntryData] = useState({});
@@ -62,14 +67,23 @@ const Properties = () => {
     }
   }
 
-  const updatePaymentEntryData = (tenantId, month) => {
-    getPaymentEntryData(tenantId, month)
+  const updatePaymentEntryData = (tenantId, year, month) => {
+    console.log('====> updatePaymentEntryData year', year);
+    getPaymentEntryData(tenantId, year, month)
       .then(res => {
-        //        console.log('====> res', res);
+                console.log('====> res', res);
         tenantDropdownRef.current.style.display = 'none';
         const due_fees = Object.keys(res.due_fees).length > 0 ? res.due_fees : res.unit_fees;
         setPaymentEntryData({
-          unit: { unit_id: res.unit_id, unit_number: res.unit_number, unit_fees: res.unit_fees, rent_amount: res.unit_rent, tenant_id: res.tenant_id, last_name: res.last_name, first_name: res.first_name },
+          unit: { 
+            unit_id: res.unit_id, 
+            unit_number: res.unit_number, 
+            tenant_monthly_fees: res.tenant_monthly_fees, 
+            tenant_rent_amount: res.tenant_rent_amount, 
+            tenant_id: res.tenant_id, 
+            last_name: res.last_name, 
+            first_name: res.first_name 
+          },
           ledgerMonth: res.ledger_month,
           ledgerData: {
             check_amount: res.check_amount,
@@ -94,7 +108,7 @@ const Properties = () => {
     const el = event.currentTarget;
     const id = el.dataset.id;
     setTenantId(id);
-    updatePaymentEntryData(id, ledgerMonth);
+    updatePaymentEntryData(id, ledgerYear, ledgerMonth);
   }
 
   const handleAddTenantButton = event => {
@@ -105,9 +119,14 @@ const Properties = () => {
   const handleMonthChange = event => {
     const month = event.target.value;
     setLedgerMonth(month);
-    updatePaymentEntryData(tenantId, month);
-
+    updatePaymentEntryData(tenantId, ledgerYear, month);
   }
+
+  const handleYearChange = event => {
+    const year = event.target.value;
+    setLedgerYear(year);
+    updatePaymentEntryData(tenantId, year, ledgerMonth);
+}
 
   const tenantSearchStyle = {
     width: '100px'
@@ -127,6 +146,15 @@ const Properties = () => {
           >
             {generateMonthOptions()}
           </select>
+          <label htmlFor="ledgerYear">Year:</label>
+          <select
+            id="ledgerYear"
+            value={ledgerYear}
+            onChange={handleYearChange}
+          >
+            {generateYearOptions()}
+          </select>
+
         </div>
 
         <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} /> <button onClick={handleAddTenantButton} className="btn btn-warning">+</button>

@@ -117,13 +117,13 @@ function PropertyEdit() {
     useEffect(() => {
         const tenantIds = units.map(item => item.tenant_id);
         if (tenantIds.length > 0) {
-            getPayments(ledgerMonth, tenantIds)
+            getPayments(ledgerYear, ledgerMonth, tenantIds)
                 .then(res => {
-                    console.log('====> ledgerData for month', ledgerMonth, res);
+                    console.log('====> ledgerData for month', ledgerYear, ledgerMonth, res);
                     setLedgerData(res);
                 });
         }
-    }, [ledgerMonth, units])
+    }, [ledgerYear, ledgerMonth, units])
 
     const handleFeeChange = e => {
         const field = e.currentTarget;
@@ -230,7 +230,7 @@ function PropertyEdit() {
                     />;
 
                 })}
-                <tbody>
+                <tbody style={{display:'none'}}>
                     <tr>
                         <td colSpan={columns} style={{ textAlign: 'right' }}>Property Total:</td>
                         <Money>{format$(propertyMonthlyTotal)}</Money>

@@ -212,8 +212,8 @@ export const saveLedgerEntry = async (payload) => {
     }
 }
 
-export const getPayments = async (ledger_month, tenant_ids) => {
-    const payload = { ledger_month, tenant_ids };
+export const getPayments = async (ledger_year, ledger_month, tenant_ids) => {
+    const payload = { ledger_year, ledger_month, tenant_ids };
     try {
         const response = await fetch(REST.getPayments, {
             method: 'POST',
@@ -235,10 +235,9 @@ export const getPayments = async (ledger_month, tenant_ids) => {
     }
 }
 
-export const getPaymentEntryData = async (tenant_id, ledger_month) => {
-    const payload = { ledger_month, tenant_id };
+export const getPaymentEntryData = async (tenant_id, ledger_year, ledger_month) => {
     try {
-        const response = await fetch(`${REST.getPaymentEntryData}/${tenant_id}/${ledger_month}`, {
+        const response = await fetch(`${REST.getPaymentEntryData}/${tenant_id}/${ledger_year}/${ledger_month}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
