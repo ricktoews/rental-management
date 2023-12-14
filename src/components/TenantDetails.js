@@ -1,7 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getTenant, getUnoccupiedUnits, saveTenant, moveIn, moveOut } from '../utils/apis';
 import { FEES } from "../config/constants";
+import styled from 'styled-components';
+
+const CenteredTh = styled.th`
+    text-align: center;
+`;
+
+const StyledInput = styled.input`
+    border-radius: 4px;
+    margin: 4px 0;
+    border: 1px solid #ccc;
+`;
+
+const FeeInput = styled(StyledInput)`
+    width: 50px;
+    text-align: right;
+`;
+
 
 const TenantDetails = () => {
     const { tenant_id } = useParams();
@@ -16,7 +33,7 @@ const TenantDetails = () => {
     const [startingBalance, setStartingBalance] = useState(0);
     const [unitId, setUnitId] = useState();
     const [vacantUnits, setVacantUnits] = useState([]);
-
+console.log('====> TenantDetails, unitId', unitId);
     const unitSelectionRef = useRef();
 
     useEffect(() => {
@@ -43,7 +60,7 @@ const TenantDetails = () => {
                     setVacantUnits(res);
                 })
             })
-    }, []);
+    }, [unitId]);
 
     const getFeesForUnit = (fee_data = {}) => {
         const due = {};
@@ -133,7 +150,87 @@ const TenantDetails = () => {
 
     return (
         <div>
+            <Link to="/">Return to Property List</Link>
+
             <h2>Tenant Details</h2>
+            <table className="table">
+                <tbody>
+                    <tr className="table-success">
+                        <td colSpan="2">Address, Unit</td>
+                    </tr>
+
+                {!unitId ? (
+                            <tr>
+                                <td>
+                                    <select ref={unitSelectionRef}>
+                                    {vacantUnits.map((item, key) => <option key={key} value={item.unit_id}>{item.address}, {item.unit_number}</option>)}
+                                    </select>
+                                </td>
+                                <td>
+                                    <button className="btn btn-success" onClick={handleMoveIn}>Move In</button>
+                                </td>
+                            </tr>
+                            ) : (
+                            <tr>
+                                <td>{address}, {unitNumber}</td>
+                                <td><button className="btn btn-success" onClick={handleMoveOut}>Move Out</button></td>
+                            </tr>
+                            )
+                    }
+                    <tr className="table-success">
+                        <td>First name</td>
+                        <td>Last name</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" data-field="firstName" onChange={handleChange} value={firstName} /></td>
+                        <td><input type="text" data-field="lastName" onChange={handleChange} value={lastName} /></td>
+                    </tr>
+                    <tr className="table-success">
+                        <td>Email</td>
+                        <td>Phone</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" data-field="email" onChange={handleChange} value={email} /></td>
+                        <td><input type="text" data-field="phone" onChange={handleChange} value={phone} /></td>
+                    </tr>
+                    <tr className="table-success">
+                        <td>Monthly Rent</td>
+                        <td>Starting Balance</td>
+                    </tr><tr>
+                        <td><input type="text" data-field="rent" onChange={handleChange} value={rent} /></td>
+                        <td><input type="text" data-field="startingBalance" onChange={handleChange} value={startingBalance} /></td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <table className="table">
+                <thead>
+                    <tr className="table-success">
+                        {FEES.map((feeObj, key) => {
+                            const feeLabel = Object.values(feeObj)[0];
+                            return <th key={key}>{feeLabel}</th>
+                        })}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    {FEES.map((feeObj, key) => {
+                        const feeKey = Object.keys(feeObj)[0];
+                        const feeValue = Object.values(feeObj)[0];
+
+                        return <td key={key}>$<FeeInput data-monthly={feeKey} onChange={handleFeeChange} value={fees[feeKey] || ''} /></td>
+                    })}
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style={{display: "flex", justifyContent: "center"}}>
+            <button className="btn btn-success" onClick={handleButton}>Save</button>
+            </div>
+            
+
+{/*
             <table>
                 <tbody>
                     {!unitNumber ?
@@ -189,6 +286,7 @@ const TenantDetails = () => {
 
                 </tbody>
             </table>
+             */}
         </div>
     );
 };
