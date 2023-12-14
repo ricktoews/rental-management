@@ -62,8 +62,8 @@ function PropertyEdit() {
     const nextYear = new Date().getFullYear() + 1;
     const _recapMonth = (new Date().getMonth()) % 12 + 1;
     const [address, setAddress] = useState('');
-    const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
-    const [ledgerYear, setLedgerYear] = useState(nextMonth < currentMonth ? nextYear : currentYear);
+    const [ledgerMonth, setLedgerMonth] = useState(currentMonth);
+    const [ledgerYear, setLedgerYear] = useState(currentYear);
     const [recapMonth, setRecapMonth] = useState(_recapMonth);
     const [recapYear, setRecapYear] = useState(currentYear);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
@@ -85,23 +85,23 @@ function PropertyEdit() {
                     setAddress(res.property_address);
                     setPropertyFees(propertyFees);
                     setUnits(res.units);
-/*
-                    const _feeCharged = {};
-                    Object.keys(propertyFees).forEach(item => {
-                        if (res.property_fees[item]) {
-                            _feeCharged[item] = true;
-                        }
-                    });
-                    const unitFeesArray = res.units.filter(item => item.unit_fees).map(item => item.unit_fees);
-                    unitFeesArray.forEach(unitFees => {
-                        Object.keys(unitFees).forEach(item => {
-                            if (unitFees[item]) {
-                                _feeCharged[item] = true;
-                            }
-                        });
-                    })
-                    setFeeCharged(_feeCharged);
-                    */
+                    /*
+                                        const _feeCharged = {};
+                                        Object.keys(propertyFees).forEach(item => {
+                                            if (res.property_fees[item]) {
+                                                _feeCharged[item] = true;
+                                            }
+                                        });
+                                        const unitFeesArray = res.units.filter(item => item.unit_fees).map(item => item.unit_fees);
+                                        unitFeesArray.forEach(unitFees => {
+                                            Object.keys(unitFees).forEach(item => {
+                                                if (unitFees[item]) {
+                                                    _feeCharged[item] = true;
+                                                }
+                                            });
+                                        })
+                                        setFeeCharged(_feeCharged);
+                                        */
                 })
         }
     }, [propertyId]);
@@ -150,6 +150,7 @@ function PropertyEdit() {
             <h2>{address}</h2>
 
             {/* Payment Month Dropdown */}
+            {/*
             <div className="month-selector">
                 <label htmlFor="recapMonth">Recap Month:</label>
                 <select
@@ -169,9 +170,9 @@ function PropertyEdit() {
                 </select>
 
             </div>
+*/}
 
-
-            <Link to={`/rent-recap/${propertyId}/${recapMonth}/${recapYear}`}>Rent Recap</Link>
+            <Link to={`/rent-recap/${propertyId}/${ledgerMonth}/${ledgerYear}`}>Rent Recap</Link>
             <hr />
             {/* Property Fees Table */}
             {/*
@@ -230,7 +231,7 @@ function PropertyEdit() {
                     />;
 
                 })}
-                <tbody style={{display:'none'}}>
+                <tbody style={{ display: 'none' }}>
                     <tr>
                         <td colSpan={columns} style={{ textAlign: 'right' }}>Property Total:</td>
                         <Money>{format$(propertyMonthlyTotal)}</Money>

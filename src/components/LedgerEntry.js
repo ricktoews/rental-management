@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styled from 'styled-components';
-import {format$, getDefaultCheckDate, getFirstDayOfNextMonth} from "../utils/helpers";
-import {saveLedgerEntry} from '../utils/apis';
-import {FEES} from "../config/constants";
+import { format$, getDefaultCheckDate, getFirstDayOfNextMonth } from "../utils/helpers";
+import { saveLedgerEntry } from '../utils/apis';
+import { FEES } from "../config/constants";
 
 const StyledInput = styled.input`
     border-radius: 4px;
@@ -28,7 +28,7 @@ const Money = styled.td`
 text-align: right;
 `;
 
-function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
+function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
     const [dueRent, setDueRent] = useState(unit.tenant_rent_amount);
     const [dueFees, setDueFees] = useState({});
@@ -50,17 +50,15 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
             const feeKey = Object.keys(feeObj)[0];
             total += 1 * dueFees[feeKey];
         })
-        console.log('====> calcTotalDue', total);
         setTotalDue(total);
     }
 
     const calcTotalPaid = () => {
-        let total = 1 * paidRent;
+        let total = 1 * paidRent + 1 * lateFee;
         FEES.forEach(feeObj => {
             const feeKey = Object.keys(feeObj)[0];
             total += (paidFees.hasOwnProperty(feeKey) ? 1 * paidFees[feeKey] : 0);
         })
-        //        console.log('====> calcTotalPaid paidFees', paidFees);
         //        const total = (1 * rent + 1 * scep + 1 * rsd + 1 * trash + 1 * parking).toFixed(2);
         setTotalPaid(total);
         setCheckAmount(total);
@@ -84,6 +82,7 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
             const feeKey = Object.keys(feeObj)[0];
             _totalDue += (1 * due[feeKey] || 0);
         })
+        _totalDue = _totalDue.toFixed(2); // ad hoc to fix the check amount. 
         setPaidRent(dueRent);
         setDueFees(due);
         setPaidFees(due);
@@ -102,21 +101,20 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
                 const feeKey = Object.keys(feeObj)[0];
                 _totalDue += (due[feeKey] || 0);
             })
-            let _totalPaid = 1 * ledgerData.paid_rent;
+            let _totalPaid = 1 * ledgerData.paid_rent + 1 * ledgerData.late_fee;
             FEES.forEach(feeObj => {
                 const feeKey = Object.keys(feeObj)[0];
                 _totalPaid += (paid[feeKey] || 0);
             })
-
             setDueRent(1 * ledgerData.due_rent);
             setPaidRent(1 * ledgerData.paid_rent);
+            setLateFee(1 * ledgerData.late_fee);
             setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(ledgerData.check_number);
             setCheckAmount(ledgerData.check_amount);
             setCheckDate(ledgerData.check_date);
             setTotalDue(_totalDue);
-            console.log('====> set total paid to _totalPaid', _totalPaid);
             setTotalPaid(_totalPaid);
             setLedgerDataEntered(true);
         } else {
@@ -149,6 +147,7 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
             check_date: checkDate,
             due_rent: 1 * dueRent,
             paid_rent: 1 * paidRent,
+            late_fee: 1 * lateFee,
             due_fees: dueFees,
             paid_fees: paidFees
 
@@ -164,7 +163,7 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
         const paid = el.value;
         const feeKey = el.dataset.monthly;
         setIsDirty(true);
-        setPaidFees({...paidFees, [feeKey]: paid});
+        setPaidFees({ ...paidFees, [feeKey]: paid });
         console.log('====> handlePaidFees, fee', paid, feeKey);
     }
 
@@ -194,7 +193,6 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
     const handleCheckAmount = e => {
         const el = e.currentTarget;
         setIsDirty(true);
-        console.log('====> setting check amount to', el.value);
         setCheckAmount(el.value);
 
         if (el.value == totalDue) {
@@ -236,8 +234,6 @@ function LedgerEntry({unit, ledgerMonth, ledgerYear, ledgerData}) {
 
     const tenant_id = unit.tenant_id;
 
-    const style = {color: 'green'};
-console.log('====> unit', unit);
     return (<>
         <tbody className="ledger-entry">
             <tr>
@@ -249,7 +245,7 @@ console.log('====> unit', unit);
             <tr>
                 <td colSpan="3">
                     <table className="table">
-                        <tbody style={{fontSize: '10pt'}}>
+                        <tbody style={{ fontSize: '10pt' }}>
                             <tr>
                                 <td><b>Rent</b></td>
                                 {FEES.map((feeObj, key) => {
@@ -286,7 +282,7 @@ console.log('====> unit', unit);
                 <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
                 <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
             </tr>
-            <tr style={{display:'none'}}>
+            <tr style={{ display: 'none' }}>
                 <td>$<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
 
                 <td><CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
@@ -294,7 +290,7 @@ console.log('====> unit', unit);
                 <td><CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
             </tr>
 
-            <tr style={{display: 'none'}} className="table-success" data-tenant_id={tenant_id}>
+            <tr style={{ display: 'none' }} className="table-success" data-tenant_id={tenant_id}>
                 {/* Rent payment received this month */}
                 <td colSpan="3">Paid this month</td>
             </tr>
@@ -335,7 +331,7 @@ console.log('====> unit', unit);
                 </td>
             </tr>
         </tbody>
-        <tbody style={{display: 'none'}} className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
+        <tbody style={{ display: 'none' }} className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
             <tr>
                 <td>Unit {unit.unit_number}</td>
                 <td colSpan={8}>Tenant: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link> <Link to={`/ledger-card/${unit.tenant_id}`}>Ledger Card</Link></td>

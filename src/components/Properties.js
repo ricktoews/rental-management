@@ -28,8 +28,8 @@ const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [filteredTenants, setFilteredTenants] = useState([]);
-  const [ledgerMonth, setLedgerMonth] = useState(nextMonth);
-  const [ledgerYear, setLedgerYear] = useState(nextMonth < currentMonth ? nextYear : currentYear);
+  const [ledgerMonth, setLedgerMonth] = useState(currentMonth);
+  const [ledgerYear, setLedgerYear] = useState(currentYear);
   const [tenantId, setTenantId] = useState(-1);
   const [ledgerRecord, setLedgerRecord] = useState({});
   const [paymentEntryData, setPaymentEntryData] = useState({});
@@ -61,7 +61,7 @@ const Properties = () => {
     const el = event.currentTarget;
     const value = el.value || '';
     if (value.length >= 1) {
-      const _filteredTenants = tenants.filter(item => item.last_name.substring(0, value.length) == value)
+      const _filteredTenants = tenants.filter(item => item.last_name.toLowerCase().substring(0, value.length) == value.toLowerCase())
       setFilteredTenants(_filteredTenants);
       tenantDropdownRef.current.style.display = 'block';
     }
@@ -71,20 +71,21 @@ const Properties = () => {
     console.log('====> updatePaymentEntryData year', year);
     getPaymentEntryData(tenantId, year, month)
       .then(res => {
-                console.log('====> res', res);
+        console.log('====> res', res);
         tenantDropdownRef.current.style.display = 'none';
         const due_fees = Object.keys(res.due_fees).length > 0 ? res.due_fees : res.unit_fees;
         setPaymentEntryData({
-          unit: { 
-            unit_id: res.unit_id, 
-            unit_number: res.unit_number, 
-            tenant_monthly_fees: res.tenant_monthly_fees, 
-            tenant_rent_amount: res.tenant_rent_amount, 
-            tenant_id: res.tenant_id, 
-            last_name: res.last_name, 
-            first_name: res.first_name 
+          unit: {
+            unit_id: res.unit_id,
+            unit_number: res.unit_number,
+            tenant_monthly_fees: res.tenant_monthly_fees,
+            tenant_rent_amount: res.tenant_rent_amount,
+            tenant_id: res.tenant_id,
+            last_name: res.last_name,
+            first_name: res.first_name
           },
           ledgerMonth: res.ledger_month,
+          ledgerYear: res.ledger_year,
           ledgerData: {
             check_amount: res.check_amount,
             check_number: res.check_number,
@@ -95,6 +96,7 @@ const Properties = () => {
             due_rent: res.due_rent,
             paid_fees: res.paid_fees,
             paid_rent: res.paid_rent,
+            late_fee: res.late_fee,
             tenant_id: res.tenant_id
           },
           propertyFees: res.property_fees,
@@ -126,7 +128,7 @@ const Properties = () => {
     const year = event.target.value;
     setLedgerYear(year);
     updatePaymentEntryData(tenantId, year, ledgerMonth);
-}
+  }
 
   const tenantSearchStyle = {
     width: '100px'
@@ -168,7 +170,8 @@ const Properties = () => {
         {paymentEntryData.tenant_id && <table className="unit-payments table table-striped">
           <LedgerEntry
             unit={paymentEntryData.unit}
-            month={paymentEntryData.ledgerMonth}
+            ledgerMonth={paymentEntryData.ledgerMonth}
+            ledgerYear={paymentEntryData.ledgerYear}
             ledgerData={paymentEntryData.ledgerData}
             propertyFees={paymentEntryData.propertyFees}
             feeCharged={paymentEntryData.feeCharged}

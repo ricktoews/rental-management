@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getLedgerCard } from '../utils/apis.js';
+import { format$ } from '../utils/helpers.js';
 import { processLedgerData } from './LedgerCardUtils.js';
 import { FEES, MONTH_NAMES } from '../config/constants';
 
@@ -55,7 +56,7 @@ function LedgerCard() {
                         <td></td>
                         <td></td>
                         <td>Starting balance</td>
-                        <td>{ledgerData.starting_balance}</td>
+                        <td>{format$(ledgerData.starting_balance)}</td>
                     </tr>
                 </tbody>
                 {ledgerData.ledger_months.map((entry, key) => {
@@ -68,19 +69,19 @@ function LedgerCard() {
                                 <td>{ledgerData.first_name}</td>
                                 <td>{ledgerData.last_name}</td>
                                 <td>{entry.check_date}</td>
-                                <td>{entry.due_total}</td>
+                                <td>{format$(entry.due_total)}</td>
                                 <td></td>
                                 <td></td>
-                                <td>{balance1}</td>
+                                <td>{format$(balance1)}</td>
                             </tr>
                             <tr>
                                 <td>{ledgerData.first_name}</td>
                                 <td>{ledgerData.last_name}</td>
                                 <td>{entry.check_date}</td>
                                 <td></td>
-                                <td>{entry.check_amount}</td>
+                                <td>{format$(entry.check_amount)}</td>
                                 <td>{entry.check_number}</td>
-                                <td>{balance2}</td>
+                                <td>{format$(balance2)}</td>
                             </tr>
                         </tbody>
                     )
