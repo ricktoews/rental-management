@@ -102,7 +102,10 @@ const Properties = () => {
           },
           propertyFees: res.property_fees,
           tenant_id: res.tenant_id
-        })
+        });
+        if (!res.tenant_id) {
+          navigate(`/tenant-details/${tenantId}`);
+        }
       });
 
   }
