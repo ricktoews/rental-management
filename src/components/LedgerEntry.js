@@ -30,6 +30,8 @@ text-align: right;
 
 function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
+    const [ledgerId, setLedgerId] = useState();
+    const [paymentNdx, setPaymentNdx] = useState();
     const [dueRent, setDueRent] = useState(unit.tenant_rent_amount);
     const [dueFees, setDueFees] = useState({});
     const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
@@ -44,6 +46,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
     const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
+
+    const [payments, setPayments] = useState([]);
 
     const calcTotalDue = () => {
         let total = 1 * dueRent;
@@ -74,6 +78,10 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
         return due;
     }
 
+    const addPayment = (newPayment) => {
+        setPayments((prevPayments) => [...prevPayments, newPayment]);
+    }
+
     useEffect(() => {
         const due = getFeesForUnit(unit.tenant_monthly_fees);
 
@@ -90,10 +98,23 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
         setTotalDue(_totalDue);
         setTotalPaid(0);
         setCheckAmount(_totalDue);
+
+        const payment = {
+            paidRent: 0,
+            paidFees: {},
+            lateFee: 0,
+            checkNumber: '',
+            checkAmount: 0,
+            checkDate: '',
+            ledgerNotes: ''
+        }
+
+        addPayment(payment);
     }, []);
 
     useEffect(() => {
         if (typeof ledgerData === 'object' && Object.keys(ledgerData).length > 0) {
+            setPayments([]);
             const due = getFeesForUnit(ledgerData.due_fees);
             setDueFees(due);
             const paid = getFeesForUnit(ledgerData.paid_fees);
@@ -107,6 +128,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
                 const feeKey = Object.keys(feeObj)[0];
                 _totalPaid += (paid[feeKey] || 0);
             })
+            setLedgerId(ledgerData.ledger_id);
             setDueRent(1 * ledgerData.due_rent);
             setPaidRent(1 * ledgerData.paid_rent);
             setLateFee(1 * ledgerData.late_fee);
@@ -119,9 +141,35 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
             setTotalPaid(_totalPaid);
             setLedgerNotes(ledgerData.notes);
             setLedgerDataEntered(true);
+
+            const payment = {
+                paidRent: ledgerData.paid_rent,
+                paidFees: paid,
+                lateFee: ledgerData.late_fee,
+                checkNumber: ledgerData.check_number,
+                checkAmount: ledgerData.check_amount,
+                checkDate: ledgerData.check_date,
+                ledgerNotes: ledgerData.notes
+            }
+
+            addPayment(payment);
+
+            const paymentBlank = {
+                paidRent: 0,
+                paidFees: {},
+                lateFee: 0,
+                checkNumber: '',
+                checkAmount: 0,
+                checkDate: '',
+                ledgerNotes: ''
+            }
+            addPayment(paymentBlank);
+
         } else {
             setCheckNumber('');
             setTotalPaid(0);
+
+            setPayments([]);
         }
     }, [ledgerData])
 
@@ -138,12 +186,13 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
     const handleSaveLedger = () => {
         if (!checkNumber || !checkAmount) return;
 
-        console.log('====> handleSaveLedger checkAmount', checkAmount);
+        console.log('====> handleSaveLedger ledgerId', ledgerId, 'Payment Ndx', paymentNdx, 'checkAmount', checkAmount);
         //        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
         const payload = {
             tenant_id,
             ledger_month: ledgerMonth,
             ledger_year: ledgerYear,
+            payment_ndx: paymentNdx,
             check_number: checkNumber,
             check_amount: 1 * checkAmount,
             check_date: checkDate,
@@ -156,7 +205,14 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
         };
         console.log('====> handleSaveLedger', payload);
-        saveLedgerEntry(payload);
+        //        saveLedgerEntry(payload);
+    }
+
+    const getPaymentBlockNdx = currentEl => {
+        const containingPaymentBlock = currentEl.closest('tbody[data-paymentblock]');
+        const dataset = containingPaymentBlock.dataset;
+        const ndx = dataset.paymentblock;
+        return ndx;
     }
 
     const handlePaidFees = e => {
@@ -165,6 +221,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
         const paid = el.value;
         const feeKey = el.dataset.monthly;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         setPaidFees({ ...paidFees, [feeKey]: paid });
         console.log('====> handlePaidFees, fee', paid, feeKey);
@@ -172,18 +230,25 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
     const handlePaidRent = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         setPaidRent(el.value);
     }
 
     const handleLateFee = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         setLateFee(el.value);
     }
 
     const handleLedgerNotes = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
+        console.log('====> handleLedgerNotes; payment block', pmtNdx);
         setIsDirty(true);
         setLedgerNotes(el.value);
     }
@@ -200,6 +265,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
     const handleCheckAmount = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         setCheckAmount(el.value);
 
@@ -212,6 +279,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
     const handleCheckNumber = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         console.log('====> setting check number from check number change', el.value);
         setCheckNumber(el.value);
@@ -219,6 +288,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
 
     const handleCheckDate = e => {
         const el = e.currentTarget;
+        const pmtNdx = getPaymentBlockNdx(el);
+        setPaymentNdx(pmtNdx);
         setIsDirty(true);
         setCheckDate(el.value);
     }
@@ -284,139 +355,66 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData }) {
                     </table>
                 </td>
             </tr>
-            <tr className="table-success" data-tenant_id={tenant_id}>
-                {/* Check amount received this month (should match total due this month) */}
-                <td>Paid this month $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
-                <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
-                <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
-            </tr>
-            <tr style={{ display: 'none' }}>
-                <td>$<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
 
-                <td><CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
+            {payments.map((pmt, key) => {
+                const pmtNo = key + 1;
+                return (
+                    <tbody data-paymentblock={key}>
+                        <tr className="table-success" data-tenant_id={tenant_id}>
+                            {/* Check amount received this month (should match total due this month) */}
+                            <td>Payment {pmtNo}: $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={pmt.checkAmount} /></td>
+                            <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={pmt.checkNumber} /></td>
+                            <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={pmt.checkDate} /></td>
+                        </tr>
+                        <tr>
+                            <td colSpan="3">
+                                <table className="table">
+                                    <tbody>
+                                        <tr>
+                                            <td>Rent</td>
+                                            <td>Late fee</td>
+                                            {FEES.map((feeObj, key) => {
+                                                const feeKey = Object.keys(feeObj)[0];
+                                                const feeValue = Object.values(feeObj)[0];
+                                                if (unit.tenant_monthly_fees[feeKey] > 0) {
+                                                    return <td key={key}>{feeValue}</td>
+                                                } else {
+                                                    return null;
+                                                }
+                                            })}
+                                        </tr>
+                                        <tr>
+                                            <td>$<PaymentInput data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={pmt.paidRent} /></td>
+                                            <td>$<PaymentInput data-monthly="paid-rent" onBlur={recalcPaid} onChange={handleLateFee} value={pmt.lateFee} /></td>
+                                            {FEES.map((feeObj, key) => {
+                                                const feeKey = Object.keys(feeObj)[0];
+                                                const feeValue = Object.values(feeObj)[0];
+                                                if (unit.tenant_monthly_fees[feeKey] > 0) {
+                                                    return <td key={key}>$<PaymentInput data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={pmt.paidFees[feeKey] || ''} /></td>
+                                                } else {
+                                                    return null;
+                                                }
+                                            })}
 
-                <td><CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
-            </tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
-            <tr style={{ display: 'none' }} className="table-success" data-tenant_id={tenant_id}>
-                {/* Rent payment received this month */}
-                <td colSpan="3">Paid this month</td>
-            </tr>
-            <tr>
-                <td colSpan="3">
-                    <table className="table">
-                        <tbody>
-                            <tr>
-                                <td>Rent</td>
-                                <td>Late fee</td>
-                                {FEES.map((feeObj, key) => {
-                                    const feeKey = Object.keys(feeObj)[0];
-                                    const feeValue = Object.values(feeObj)[0];
-                                    if (unit.tenant_monthly_fees[feeKey] > 0) {
-                                        return <td key={key}>{feeValue}</td>
-                                    } else {
-                                        return null;
-                                    }
-                                })}
-                            </tr>
-                            <tr>
-                                <td>$<PaymentInput data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={paidRent} /></td>
-                                <td>$<PaymentInput data-monthly="paid-rent" onBlur={recalcPaid} onChange={handleLateFee} value={lateFee} /></td>
-                                {FEES.map((feeObj, key) => {
-                                    const feeKey = Object.keys(feeObj)[0];
-                                    const feeValue = Object.values(feeObj)[0];
-                                    if (unit.tenant_monthly_fees[feeKey] > 0) {
-                                        return <td key={key}>$<PaymentInput data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
-                                    } else {
-                                        return null;
-                                    }
-                                })}
+                            </td>
+                        </tr>
+                        <tr className="table-success">
+                            <td colSpan="3">Notes</td>
+                        </tr>
+                        <tr>
+                            <td colSpan="3">
+                                <textarea onChange={handleLedgerNotes} onBlur={handleSaveIfDirty} value={pmt.ledgerNotes} />
+                            </td>
+                        </tr>
+                    </tbody>
 
-                            </tr>
-                        </tbody>
-                    </table>
+                );
+            })}
 
-                </td>
-            </tr>
-            <tr className="table-success">
-                <td colSpan="3">Notes</td>
-            </tr>
-            <tr>
-                <td colSpan="3">
-                    <textarea onChange={handleLedgerNotes} onBlur={handleSaveIfDirty} value={ledgerNotes} />
-                </td>
-            </tr>
-        </tbody>
-        <tbody style={{ display: 'none' }} className={`ledger-entry ${ledgerDataEntered ? 'entered' : ''}`}>
-            <tr>
-                <td>Unit {unit.unit_number}</td>
-                <td colSpan={8}>Tenant: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link> <Link to={`/ledger-card/${unit.tenant_id}`}>Ledger Card</Link></td>
-            </tr>
-            <tr data-unit_id={unit.unit_id}>
-                <td></td>
-                {/* These amounts should default to values from units but saved to ledger table. */}
-
-                {/* Rent due this month */}
-                <td>Due this month:  <b>Rent</b> ${dueRent} {/*<input data-monthly="due-rent" onBlur={recalcDue} onChange={handleDueRent} value={dueRent} />*/}</td>
-
-                {FEES.map((feeObj, key) => {
-                    const feeKey = Object.keys(feeObj)[0];
-                    const feeValue = Object.values(feeObj)[0];
-                    if (unit.tenant_monthly_fees[feeKey] > 0) {
-                        return <td key={key}><b>{feeValue}</b> ${dueFees[feeKey]}{/*<input data-monthly={feeKey} onBlur={recalcDue} onChange={handleDueFees} value={dueFees[feeKey] || ''} />*/}</td>
-                    } else {
-                        return null;
-                    }
-                })}
-
-                {/* Total due this month (should match check amount in most cases) */}
-                <td>Total due: {format$(totalDue)}</td>
-
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-
-            <tr data-tenant_id={tenant_id}>
-                <td></td>
-
-                {/* Check amount received this month (should match total due this month) */}
-                <td><b>Check amount</b> $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
-
-                <td><b>Check #</b> <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
-
-                <td><b>Date</b> <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
-
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-
-            <tr data-tenant_id={tenant_id}>
-                <td></td>
-
-                {/* Rent payment received this month */}
-                <td>Paid this month: <b>Rent</b> $<input data-monthly="paid-rent" onBlur={recalcPaid} onChange={handlePaidRent} value={paidRent} /></td>
-
-                {FEES.map((feeObj, key) => {
-                    const feeKey = Object.keys(feeObj)[0];
-                    const feeValue = Object.values(feeObj)[0];
-                    if (unit.tenant_monthly_fees[feeKey] > 0) {
-                        return <td key={key}><b>{feeValue}</b> $<input data-monthly={feeKey} onBlur={recalcPaid} onChange={handlePaidFees} value={paidFees[feeKey] || ''} /></td>
-                    } else {
-                        return null;
-                    }
-                })}
-
-
-                <td>{totalPaid > 0 && `Total paid: ${format$(totalPaid)}` || null}</td>
-
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
         </tbody>
     </>
     )
