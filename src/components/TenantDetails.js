@@ -33,10 +33,15 @@ const TenantDetails = () => {
     const [startingBalance, setStartingBalance] = useState(0);
     const [unitId, setUnitId] = useState();
     const [vacantUnits, setVacantUnits] = useState([]);
-console.log('====> TenantDetails, unitId', unitId);
+    console.log('====> TenantDetails, unitId', unitId);
     const unitSelectionRef = useRef();
 
     useEffect(() => {
+        getUnoccupiedUnits().then(res => {
+            console.log('====> Unoccupied units', res);
+            setVacantUnits(res);
+        })
+
         if (tenant_id === 'new') return;
 
         getTenant(tenant_id)
@@ -54,11 +59,6 @@ console.log('====> TenantDetails, unitId', unitId);
                 setRent(tenantData.rent_amount || 0);
                 setFees(tenantData.monthly_fees || {});
                 setStartingBalance(tenantData.starting_balance || 0);
-
-                getUnoccupiedUnits().then(res => {
-                    console.log('====> Unoccupied units', res);
-                    setVacantUnits(res);
-                })
             })
     }, [unitId]);
 
@@ -74,6 +74,7 @@ console.log('====> TenantDetails, unitId', unitId);
 
     const saveTenantDetails = async () => {
         const details = {
+            unit_id: unitSelectionRef.current.value,
             first_name: firstName,
             last_name: lastName,
             email,
@@ -159,23 +160,25 @@ console.log('====> TenantDetails, unitId', unitId);
                         <td colSpan="2">Address, Unit</td>
                     </tr>
 
-                {!unitId ? (
-                            <tr>
-                                <td>
-                                    <select ref={unitSelectionRef}>
+                    {!unitId ? (
+                        <tr>
+                            <td>
+                                <select ref={unitSelectionRef}>
+                                    <option>Select</option>
                                     {vacantUnits.map((item, key) => <option key={key} value={item.unit_id}>{item.address}, {item.unit_number}</option>)}
-                                    </select>
-                                </td>
+                                </select>
+                            </td>
+                            {tenant_id !== 'new' && (
                                 <td>
                                     <button className="btn btn-success" onClick={handleMoveIn}>Move In</button>
-                                </td>
-                            </tr>
-                            ) : (
-                            <tr>
-                                <td>{address}, {unitNumber}</td>
-                                <td><button className="btn btn-success" onClick={handleMoveOut}>Move Out</button></td>
-                            </tr>
-                            )
+                                </td>)}
+                        </tr>
+                    ) : (
+                        <tr>
+                            <td>{address}, {unitNumber}</td>
+                            <td><button className="btn btn-success" onClick={handleMoveOut}>Move Out</button></td>
+                        </tr>
+                    )
                     }
                     <tr className="table-success">
                         <td>First name</td>
@@ -215,22 +218,22 @@ console.log('====> TenantDetails, unitId', unitId);
                 </thead>
                 <tbody>
                     <tr>
-                    {FEES.map((feeObj, key) => {
-                        const feeKey = Object.keys(feeObj)[0];
-                        const feeValue = Object.values(feeObj)[0];
+                        {FEES.map((feeObj, key) => {
+                            const feeKey = Object.keys(feeObj)[0];
+                            const feeValue = Object.values(feeObj)[0];
 
-                        return <td key={key}>$<FeeInput data-monthly={feeKey} onChange={handleFeeChange} value={fees[feeKey] || ''} /></td>
-                    })}
+                            return <td key={key}>$<FeeInput data-monthly={feeKey} onChange={handleFeeChange} value={fees[feeKey] || ''} /></td>
+                        })}
                     </tr>
                 </tbody>
             </table>
-            
-            <div style={{display: "flex", justifyContent: "center"}}>
-            <button className="btn btn-success" onClick={handleButton}>Save</button>
-            </div>
-            
 
-{/*
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <button className="btn btn-success" onClick={handleButton}>Save</button>
+            </div>
+
+
+            {/*
             <table>
                 <tbody>
                     {!unitNumber ?
