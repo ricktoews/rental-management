@@ -31,9 +31,9 @@ const TenantDetails = () => {
     const [rent, setRent] = useState(0);
     const [fees, setFees] = useState({});
     const [startingBalance, setStartingBalance] = useState(0);
+    const [rentAdjustDate, setRentAdjustDate] = useState('');
     const [unitId, setUnitId] = useState();
     const [vacantUnits, setVacantUnits] = useState([]);
-    console.log('====> TenantDetails, unitId', unitId);
     const unitSelectionRef = useRef();
 
     useEffect(() => {
@@ -59,6 +59,7 @@ const TenantDetails = () => {
                 setRent(tenantData.rent_amount || 0);
                 setFees(tenantData.monthly_fees || {});
                 setStartingBalance(tenantData.starting_balance || 0);
+                setRentAdjustDate(tenantData.rent_adjust_date || '');
             })
     }, [unitId]);
 
@@ -74,14 +75,15 @@ const TenantDetails = () => {
 
     const saveTenantDetails = async () => {
         const details = {
-            unit_id: unitSelectionRef.current.value,
+            unit_id: unitSelectionRef.current ? unitSelectionRef.current.value : unitId,
             first_name: firstName,
             last_name: lastName,
             email,
             phone,
             rent_amount: rent,
             monthly_fees: JSON.stringify(fees),
-            starting_balance: startingBalance
+            starting_balance: startingBalance,
+            rent_adjust_date: rentAdjustDate
         };
         console.log('====> saveTenantDetails', tenant_id, details);
         const result = await saveTenant(tenant_id, details);
@@ -109,6 +111,8 @@ const TenantDetails = () => {
                 break;
             case 'startingBalance':
                 setStartingBalance(1 * value);
+            case 'rentAdjustDate':
+                setRentAdjustDate(value);
         }
     }
 
@@ -202,6 +206,13 @@ const TenantDetails = () => {
                     </tr><tr>
                         <td><input type="text" data-field="rent" onChange={handleChange} value={rent} /></td>
                         <td><input type="text" data-field="startingBalance" onChange={handleChange} value={startingBalance} /></td>
+                    </tr>
+                    <tr className="table-success">
+                        <td>Rent Adjust Date</td>
+                        <td></td>
+                    </tr><tr>
+                        <td><input type="text" data-field="rentAdjustDate" onChange={handleChange} value={rentAdjustDate} /></td>
+                        <td></td>
                     </tr>
 
                 </tbody>
