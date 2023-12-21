@@ -84,23 +84,6 @@ function PropertyEdit() {
                     setAddress(res.property_address);
                     setPropertyFees(propertyFees);
                     setUnits(res.units);
-                    /*
-                                        const _feeCharged = {};
-                                        Object.keys(propertyFees).forEach(item => {
-                                            if (res.property_fees[item]) {
-                                                _feeCharged[item] = true;
-                                            }
-                                        });
-                                        const unitFeesArray = res.units.filter(item => item.unit_fees).map(item => item.unit_fees);
-                                        unitFeesArray.forEach(unitFees => {
-                                            Object.keys(unitFees).forEach(item => {
-                                                if (unitFees[item]) {
-                                                    _feeCharged[item] = true;
-                                                }
-                                            });
-                                        })
-                                        setFeeCharged(_feeCharged);
-                                        */
                 })
         }
     }, [propertyId]);
@@ -121,7 +104,7 @@ function PropertyEdit() {
                     setLedgerData(res);
                 });
         }
-    }, [ledgerYear, ledgerMonth, units])
+    }, [units])
 
     const handleFeeChange = e => {
         const field = e.currentTarget;
@@ -173,7 +156,7 @@ function PropertyEdit() {
             </div>
 
             {/* Units Table */}
-            <table className="unit-payments table table-striped">
+            {units.length > 0 && <table className="unit-payments table table-striped">
                 {units.map((unit, idx) => {
                     const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
                     return <LedgerEntry key={idx}
@@ -187,7 +170,7 @@ function PropertyEdit() {
 
                 })}
 
-            </table>
+            </table>}
         </div>
     );
 }

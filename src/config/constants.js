@@ -12,6 +12,7 @@ export const REST = {
     saveProperty: API_BASE + '/property/',
     saveUnitMonthly: API_BASE + '/unit/monthly/',
     setPayment: API_BASE + '/payment',
+    savePaymentRecord: API_BASE + '/save-payment',
     getPayments: API_BASE + '/get-payments',
     getPaymentEntryData: API_BASE + '/payment-entry',
     getLedgerCard: API_BASE + '/ledger-card/',

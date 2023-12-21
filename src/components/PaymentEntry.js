@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getDefaultCheckDate } from "../utils/helpers";
+import { savePaymentRecord } from "../utils/apis";
 import { FEES } from "../config/constants";
 
 const StyledInput = styled.input`
@@ -23,10 +24,11 @@ const CheckDateInput = styled(StyledInput)`
     width: 100px;
 `;
 
-function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData }) {
+function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData, setPaymentUpdated }) {
+    const pmtNo = paymentNdx + 1;
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
     const [dueRent, setDueRent] = useState(tenantRentAmount);
-    const [dueFees, setDueFees] = useState({});
+    const [dueFees, setDueFees] = useState();
     const [paidRent, setPaidRent] = useState(paymentData?.disbursement?.rent || '');
     const [lateFee, setLateFee] = useState('');
     const [paymentNotes, setPaymentNotes] = useState('');
@@ -112,20 +114,19 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
     }, [paymentData])
 
     useEffect(() => {
-        console.log('====> checkDataUpdate');
+        console.log('====> checkDataUpdate', isDirty, checkDataUpdate, checkNumber, checkAmount, checkDate);
         if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
-            console.log('====> Check information', checkAmount, checkNumber, checkDate);
+            //console.log('====> Check information', checkAmount, checkNumber, checkDate);
             handleSavePayment();
             setCheckDataUpdate(false);
             setIsDirty(false);
         }
-    }, [checkDataUpdate]);
+    }, [isDirty, checkDataUpdate, checkDataUpdate, checkNumber, checkAmount]);
 
     const handleSavePayment = () => {
-        if (!checkNumber || !checkAmount) return;
+        if (!checkNumber || !checkAmount || Number.isNaN(checkAmount)) return;
 
-        console.log('====> handleSavePayment ledgerId', ledgerId, 'Payment Ndx', paymentNdx, 'checkAmount', checkAmount);
-        //        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
+        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
         const payload = {
             ledger_id: ledgerId,
             payment_ndx: paymentNdx,
@@ -138,7 +139,8 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
             notes: paymentNotes
         };
         console.log('====> handleSavePayment', payload);
-        //        savePaymentEntry(payload);
+        savePaymentRecord(payload);
+        //setPaymentUpdated(true);
     }
 
     const handlePaidFees = e => {
