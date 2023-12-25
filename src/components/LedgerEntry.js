@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getDefaultCheckDate, getFirstDayOfNextMonth } from "../utils/helpers";
 import PaymentEntry from "./PaymentEntry";
-import { saveLedgerEntry } from '../utils/apis';
+import { saveLedgerEntry, getPayments } from '../utils/apis';
 import { FEES } from "../config/constants";
 
 const StyledInput = styled.input`
@@ -52,7 +52,9 @@ function LedgerEntry({ unit, ledgerData = {} }) {
     const [totalPaid, setTotalPaid] = useState('');
     const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
     const [paymentUpdated, setPaymentUpdated] = useState(false);
+    const [refreshPayments, setRefreshPayments] = useState(false);
 
+    const [balance, setBalance] = useState(0);
     const [payments, setPayments] = useState([]);
 
     useEffect(() => {
@@ -68,15 +70,30 @@ function LedgerEntry({ unit, ledgerData = {} }) {
         _totalDue = _totalDue.toFixed(2); // ad hoc to fix the check amount. 
         setDueFees(due);
         setTotalDue(_totalDue);
+        setBalance(_totalDue);
     }, [ledgerData.ledger_id]);
 
     useEffect(() => {
         if (ledgerData.payments) {
-            console.log('====> payments', ledgerData.payments);
             setPayments(ledgerData.payments);
 
         }
     }, [ledgerData.payments]);
+
+    useEffect(() => {
+        if (refreshPayments) {
+            const ledgerYear = ledgerData.ledger_year;
+            const ledgerMonth = ledgerData.ledger_month;
+            const tenantIds = [ledgerData.tenant_id];
+            getPayments(ledgerYear, ledgerMonth, tenantIds)
+                .then(res => {
+                    const updatedLedger = res[0];
+                    console.log('====> refreshPayments; getPayments', updatedLedger)
+                    setPayments(updatedLedger.payments);
+                    setRefreshPayments(false);
+                });
+        }
+    }, [refreshPayments])
 
     useEffect(() => {
         if (paymentUpdated) {
@@ -268,7 +285,7 @@ function LedgerEntry({ unit, ledgerData = {} }) {
             </tr>
             <tr><td colSpan="3"><table className="table">
                 {payments.map((pmt, key) => {
-                    console.log('====> Ledger payment entry, due_rent', (due_rent - pmt.check_amount));
+                    console.log('====> Ledger payment entry, check_amount', totalDue, pmt.check_amount);
                     return (
                         <PaymentEntry key={key}
                             tenantRentAmount={due_rent}
@@ -279,6 +296,7 @@ function LedgerEntry({ unit, ledgerData = {} }) {
                             paymentNdx={key}
                             paymentData={pmt}
                             setPaymentUpdated={setPaymentUpdated}
+                            setRefreshPayments={setRefreshPayments}
                         />
                     );
                 })}
@@ -291,6 +309,8 @@ function LedgerEntry({ unit, ledgerData = {} }) {
                     paymentNdx={payments.length}
                     paymentData={{}}
                     setPaymentUpdated={setPaymentUpdated}
+                    setRefreshPayments={setRefreshPayments}
+                    newEntry={true}
                 />
 
             </table></td></tr>

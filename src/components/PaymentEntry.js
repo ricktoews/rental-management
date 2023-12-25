@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getDefaultCheckDate } from "../utils/helpers";
-import { savePaymentRecord } from "../utils/apis";
+import { savePaymentRecord, deletePaymentRecord } from "../utils/apis";
 import { FEES } from "../config/constants";
 
 const StyledInput = styled.input`
@@ -24,7 +24,7 @@ const CheckDateInput = styled(StyledInput)`
     width: 100px;
 `;
 
-function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData, setPaymentUpdated }) {
+function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData, setPaymentUpdated, setRefreshPayments }) {
     const pmtNo = paymentNdx + 1;
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
     const [dueRent, setDueRent] = useState(tenantRentAmount);
@@ -77,6 +77,7 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
         setPaidFees(due);
         setTotalDue(_totalDue);
         setTotalPaid(0);
+        console.log('====> setCheckAmount _totalDue', _totalDue);
         setCheckAmount(_totalDue);
     }, []);
 
@@ -101,6 +102,7 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
             setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(paymentData.check_number);
+            console.log('====> setCheckAmount paymentData.check_amount', paymentData.check_amount);
             setCheckAmount(paymentData.check_amount);
             setCheckDate(paymentData.check_date);
             setTotalDue(_totalDue);
@@ -140,6 +142,7 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
         };
         console.log('====> handleSavePayment', payload);
         savePaymentRecord(payload);
+        setRefreshPayments(true);
         //setPaymentUpdated(true);
     }
 
@@ -207,6 +210,15 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
         }
     }
 
+    const handleDeletePayment = async ndx => {
+        const payload = {
+            ledger_id: ledgerId,
+            payment_ndx: ndx
+        }
+        await deletePaymentRecord(payload);
+        setRefreshPayments(true);
+    }
+
     const recalcPaid = e => {
         calcTotalPaid();
         handleSaveIfDirty(e);
@@ -214,7 +226,9 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
 
     return <tbody data-paymentblock={paymentNdx}>
         <tr className="table-success">
-            <td>Payment {pmtNo}: $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
+            <td>
+                <button onClick={e => { handleDeletePayment(paymentNdx) }} style={{ marginRight: '10px' }} className="btn btn-warning">Delete</button>
+                Payment {pmtNo}: $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
             <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
             <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
         </tr>
