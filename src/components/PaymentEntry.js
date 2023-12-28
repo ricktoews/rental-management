@@ -77,7 +77,6 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
         setPaidFees(due);
         setTotalDue(_totalDue);
         setTotalPaid(0);
-        console.log('====> setCheckAmount _totalDue', _totalDue);
         setCheckAmount(_totalDue);
     }, []);
 
@@ -102,7 +101,7 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
             setDueFees(due);
             setPaidFees(paid);
             setCheckNumber(paymentData.check_number);
-            console.log('====> setCheckAmount paymentData.check_amount', paymentData.check_amount);
+            // This needs to get updated
             setCheckAmount(paymentData.check_amount);
             setCheckDate(paymentData.check_date);
             setTotalDue(_totalDue);
@@ -116,7 +115,6 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
     }, [paymentData])
 
     useEffect(() => {
-        console.log('====> checkDataUpdate', isDirty, checkDataUpdate, checkNumber, checkAmount, checkDate);
         if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
             //console.log('====> Check information', checkAmount, checkNumber, checkDate);
             handleSavePayment();

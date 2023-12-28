@@ -285,7 +285,6 @@ function LedgerEntry({ unit, ledgerData = {} }) {
             </tr>
             <tr><td colSpan="3"><table className="table">
                 {payments.map((pmt, key) => {
-                    console.log('====> Ledger payment entry, check_amount', totalDue, pmt.check_amount);
                     return (
                         <PaymentEntry key={key}
                             tenantRentAmount={due_rent}
