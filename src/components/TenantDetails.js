@@ -74,8 +74,9 @@ const TenantDetails = () => {
 
 
     const saveTenantDetails = async () => {
+        const unit_id = unitSelectionRef.current?.value || unitId;
         const details = {
-            unit_id: unitSelectionRef.current ? unitSelectionRef.current.value : unitId,
+            unit_id,
             first_name: firstName,
             last_name: lastName,
             email,
