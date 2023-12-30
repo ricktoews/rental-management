@@ -80,28 +80,10 @@ function PropertyEdit() {
         if (propertyId) {
             getPropertyById(propertyId)
                 .then(res => {
-                    console.log('====> property by ID', propertyId, res);
                     const propertyFees = res.property_fees || {};
                     setAddress(res.property_address);
                     setPropertyFees(propertyFees);
                     setUnits(res.units);
-                    /*
-                                        const _feeCharged = {};
-                                        Object.keys(propertyFees).forEach(item => {
-                                            if (res.property_fees[item]) {
-                                                _feeCharged[item] = true;
-                                            }
-                                        });
-                                        const unitFeesArray = res.units.filter(item => item.unit_fees).map(item => item.unit_fees);
-                                        unitFeesArray.forEach(unitFees => {
-                                            Object.keys(unitFees).forEach(item => {
-                                                if (unitFees[item]) {
-                                                    _feeCharged[item] = true;
-                                                }
-                                            });
-                                        })
-                                        setFeeCharged(_feeCharged);
-                                        */
                 })
         }
     }, [propertyId]);
@@ -119,11 +101,10 @@ function PropertyEdit() {
         if (tenantIds.length > 0) {
             getPayments(ledgerYear, ledgerMonth, tenantIds)
                 .then(res => {
-                    console.log('====> ledgerData for month', ledgerYear, ledgerMonth, res);
                     setLedgerData(res);
                 });
         }
-    }, [ledgerYear, ledgerMonth, units])
+    }, [units])
 
     const handleFeeChange = e => {
         const field = e.currentTarget;
@@ -149,53 +130,10 @@ function PropertyEdit() {
 
             <h2>{address}</h2>
 
-            {/* Payment Month Dropdown */}
-            {/*
-            <div className="month-selector">
-                <label htmlFor="recapMonth">Recap Month:</label>
-                <select
-                    id="recapMonth"
-                    value={recapMonth}
-                    onChange={handleMonthChange}
-                >
-                    {generateMonthOptions()}
-                </select>
-                <label htmlFor="recapYear">Year:</label>
-                <select
-                    id="recapYear"
-                    value={recapYear}
-                    onChange={handleYearChange}
-                >
-                    {generateYearOptions()}
-                </select>
-
-            </div>
-*/}
 
             <Link to={`/rent-recap/${propertyId}/${ledgerMonth}/${ledgerYear}`}>Rent Recap</Link>
             <hr />
-            {/* Property Fees Table */}
-            {/*
-            <PropertyTable className="property-fees table">
-                <thead>
-                    <tr className="table-success">
-                        {FEES.map((feeObj, key) => {
-                            const feeLabel = Object.values(feeObj)[0];
-                            return <CenteredTh key={key}>{feeLabel}</CenteredTh>
-                        })}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {FEES.map((feeObj, key) => {
-                            const feeKey = Object.keys(feeObj)[0];
-                            const feeLabel = Object.values(feeObj)[0];
-                            return <td key={key}>$<FeeInput data-fee={feeKey} onBlur={handleFeeChange} type="number" step="0.01" defaultValue={propertyFees[feeKey] || ''} /></td>
-                        })}
-                    </tr>
-                </tbody>
-            </PropertyTable>
-*/}
+
             {/* Payment Month Dropdown */}
             <div className="month-selector">
                 <label htmlFor="ledgerMonth">Payment Month:</label>
@@ -218,7 +156,7 @@ function PropertyEdit() {
             </div>
 
             {/* Units Table */}
-            <table className="unit-payments table table-striped">
+            {units.length > 0 && <table className="unit-payments table table-striped">
                 {units.map((unit, idx) => {
                     const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
                     return <LedgerEntry key={idx}
@@ -231,18 +169,8 @@ function PropertyEdit() {
                     />;
 
                 })}
-                <tbody style={{ display: 'none' }}>
-                    <tr>
-                        <td colSpan={columns} style={{ textAlign: 'right' }}>Property Total:</td>
-                        <Money>{format$(propertyMonthlyTotal)}</Money>
-                        <td></td>
-                        <td style={{ textAlign: 'right' }}>Received:</td>
-                        <Money>{format$(paymentsReceivedTotal)}</Money>
-                        <td></td>
-                    </tr>
-                </tbody>
 
-            </table>
+            </table>}
         </div>
     );
 }

@@ -212,6 +212,50 @@ export const saveLedgerEntry = async (payload) => {
     }
 }
 
+export const deletePaymentRecord = async (payload) => {
+    try {
+        const response = await fetch(REST.deletePaymentRecord, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
+export const savePaymentRecord = async (payload) => {
+    try {
+        const response = await fetch(REST.savePaymentRecord, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
 export const getPayments = async (ledger_year, ledger_month, tenant_ids) => {
     const payload = { ledger_year, ledger_month, tenant_ids };
     try {

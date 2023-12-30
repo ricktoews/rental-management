@@ -2,15 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getLedgerCard } from '../utils/apis.js';
 import { format$ } from '../utils/helpers.js';
-import { processLedgerData } from './LedgerCardUtils.js';
-import { FEES, MONTH_NAMES } from '../config/constants';
+
+function LedgerCardPayment(props) {
+    const { ledgerData, payment, entry } = props;
+    let balance = props.balance;
+
+    return (<>
+        <tr>
+            <td>{ledgerData.first_name}</td>
+            <td>{ledgerData.last_name}</td>
+            <td>{payment.check_date}</td>
+            <td></td>
+            <td>{format$(payment.check_amount)}</td>
+            <td>{payment.check_number}</td>
+            <td>{format$(balance)}</td>
+        </tr>
+        {entry.notes && (
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colSpan="4">{payment.notes}</td>
+            </tr>
+        )}
+    </>);
+}
 
 function LedgerCard() {
     const { tenantId } = useParams();
-    console.log('====> LedgerCard', tenantId);
     const [ledgerData, setLedgerData] = useState([]);
     const [address, setAddress] = useState('');
-    const [tenantName, setTenantName] = useState('');
 
     useEffect(() => {
         // Fetch ledger card data when the component loads
@@ -60,9 +81,11 @@ function LedgerCard() {
                     </tr>
                 </tbody>
                 {ledgerData.ledger_months.map((entry, key) => {
-                    const balance1 = balance + entry.due_total;
-                    const balance2 = balance1 - entry.check_amount;
-                    balance = balance2;
+                    console.log('====> Ledger Card entry', entry);
+                    balance = balance + entry.due_total;
+                    //const balance2 = balance1 - entry.check_amount;
+
+
                     return (
                         <tbody key={key}>
                             <tr>
@@ -72,8 +95,13 @@ function LedgerCard() {
                                 <td>{format$(entry.due_total)}</td>
                                 <td></td>
                                 <td></td>
-                                <td>{format$(balance1)}</td>
+                                <td>{format$(balance)}</td>
                             </tr>
+                            {entry.payments.map(payment => {
+                                balance -= payment.check_amount;
+                                return <LedgerCardPayment balance={balance} ledgerData={ledgerData} payment={payment} entry={entry} />
+                            })}
+                            {/*
                             <tr>
                                 <td>{ledgerData.first_name}</td>
                                 <td>{ledgerData.last_name}</td>
@@ -91,6 +119,7 @@ function LedgerCard() {
                                     <td colSpan="4">{entry.notes}</td>
                                 </tr>
                             )}
+                            */}
                         </tbody>
                     )
                 })}
