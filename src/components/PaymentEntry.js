@@ -24,7 +24,7 @@ const CheckDateInput = styled(StyledInput)`
     width: 100px;
 `;
 
-function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData, setPaymentUpdated, setRefreshPayments }) {
+function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledgerYear, ledgerId, paymentNdx, paymentData, setRefreshPayments }) {
     const pmtNo = paymentNdx + 1;
     const defaultCheckDate = getDefaultCheckDate(ledgerYear, ledgerMonth);
     const [dueRent, setDueRent] = useState(tenantRentAmount);
@@ -123,7 +123,7 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
         }
     }, [isDirty, checkDataUpdate, checkDataUpdate, checkNumber, checkAmount]);
 
-    const handleSavePayment = () => {
+    const handleSavePayment = async () => {
         if (!checkNumber || !checkAmount || Number.isNaN(checkAmount)) return;
 
         console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
@@ -139,9 +139,8 @@ function PaymentEntry({ tenantRentAmount, tenantMonthlyFees, ledgerMonth, ledger
             notes: paymentNotes
         };
         console.log('====> handleSavePayment', payload);
-        savePaymentRecord(payload);
+        await savePaymentRecord(payload);
         setRefreshPayments(true);
-        //setPaymentUpdated(true);
     }
 
     const handlePaidFees = e => {

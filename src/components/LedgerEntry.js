@@ -34,24 +34,10 @@ function LedgerEntry({ unit, ledgerData = {} }) {
     const { tenant_rent_amount, tenant_monthly_fees } = unit;
     const { ledger_month, ledger_year } = ledgerData;
     const { due_rent, due_fees } = ledgerData;
-    const defaultCheckDate = getDefaultCheckDate(ledger_year, ledger_month);
     const [ledgerId, setLedgerId] = useState();
-    const [paymentNdx, setPaymentNdx] = useState();
     const [dueRent, setDueRent] = useState(unit.tenant_rent_amount || 0);
     const [dueFees, setDueFees] = useState(unit.tenant_monthly_fees || {});
-    const [paidRent, setPaidRent] = useState(ledgerData?.disbursement?.rent || '');
-    const [lateFee, setLateFee] = useState('');
-    const [ledgerNotes, setLedgerNotes] = useState('');
-    const [paidFees, setPaidFees] = useState({});
-    const [checkAmount, setCheckAmount] = useState(ledgerData?.check_amount || '');
-    const [checkNumber, setCheckNumber] = useState(ledgerData?.check_number || '');
-    const [checkDate, setCheckDate] = useState(defaultCheckDate);
-    const [checkDataUpdate, setCheckDataUpdate] = useState(false);
-    const [isDirty, setIsDirty] = useState(false);
     const [totalDue, setTotalDue] = useState('');
-    const [totalPaid, setTotalPaid] = useState('');
-    const [ledgerDataEntered, setLedgerDataEntered] = useState(false);
-    const [paymentUpdated, setPaymentUpdated] = useState(false);
     const [refreshPayments, setRefreshPayments] = useState(false);
 
     const [balance, setBalance] = useState(0);
@@ -82,6 +68,7 @@ function LedgerEntry({ unit, ledgerData = {} }) {
 
     useEffect(() => {
         if (refreshPayments) {
+            console.log('====> LedgerEntry, refreshPayments');
             const ledgerYear = ledgerData.ledger_year;
             const ledgerMonth = ledgerData.ledger_month;
             const tenantIds = [ledgerData.tenant_id];
@@ -95,31 +82,6 @@ function LedgerEntry({ unit, ledgerData = {} }) {
         }
     }, [refreshPayments])
 
-    useEffect(() => {
-        if (paymentUpdated) {
-            setPaymentUpdated(false);
-        }
-    }, [paymentUpdated])
-
-    const calcTotalDue = () => {
-        let total = 1 * dueRent;
-        FEES.forEach(feeObj => {
-            const feeKey = Object.keys(feeObj)[0];
-            total += 1 * dueFees[feeKey];
-        })
-        setTotalDue(total);
-    }
-
-    const calcTotalPaid = () => {
-        let total = 1 * paidRent + 1 * lateFee;
-        FEES.forEach(feeObj => {
-            const feeKey = Object.keys(feeObj)[0];
-            total += (paidFees.hasOwnProperty(feeKey) ? 1 * paidFees[feeKey] : 0);
-        })
-        //        const total = (1 * rent + 1 * scep + 1 * rsd + 1 * trash + 1 * parking).toFixed(2);
-        setTotalPaid(total);
-        setCheckAmount(total);
-    }
     const getFeesForUnit = (fee_data = {}) => {
         const due = {};
         FEES.forEach(feeObj => {
@@ -285,6 +247,7 @@ function LedgerEntry({ unit, ledgerData = {} }) {
             </tr>
             <tr><td colSpan="3"><table className="table">
                 {payments.map((pmt, key) => {
+                    console.log('====> Payments, from LedgerEntry', pmt);
                     return (
                         <PaymentEntry key={key}
                             tenantRentAmount={due_rent}
@@ -294,7 +257,6 @@ function LedgerEntry({ unit, ledgerData = {} }) {
                             ledgerId={ledgerId}
                             paymentNdx={key}
                             paymentData={pmt}
-                            setPaymentUpdated={setPaymentUpdated}
                             setRefreshPayments={setRefreshPayments}
                         />
                     );
@@ -307,7 +269,6 @@ function LedgerEntry({ unit, ledgerData = {} }) {
                     ledgerId={ledgerId}
                     paymentNdx={payments.length}
                     paymentData={{}}
-                    setPaymentUpdated={setPaymentUpdated}
                     setRefreshPayments={setRefreshPayments}
                     newEntry={true}
                 />
