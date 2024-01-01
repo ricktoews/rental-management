@@ -157,7 +157,7 @@ function PropertyEdit() {
 
             {/* Units Table */}
             {units.length > 0 && <table className="unit-payments table table-striped">
-                {units.map((unit, idx) => {
+                {units.filter(unit => unit.tenant_id).map((unit, idx) => {
                     const ledgerRecord = ledgerData.find(item => item.unit_id == unit.unit_id);
                     return <LedgerEntry key={idx}
                         unit={unit}

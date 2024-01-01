@@ -67,12 +67,10 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
 
     useEffect(() => {
         if (refreshPayments) {
-            console.log('====> LedgerEntry, refreshPayments; ', ledgerYear, ledgerMonth, tenant_id);
             const tenantIds = [tenant_id];
             getPayments(ledgerYear, ledgerMonth, tenantIds)
                 .then(res => {
                     const updatedLedger = res[0];
-                    console.log('====> refreshPayments; getPayments', updatedLedger)
                     setPayments(updatedLedger.payments);
                     setRefreshPayments(false);
                 });

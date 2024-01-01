@@ -71,13 +71,18 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
             const feeKey = Object.keys(feeObj)[0];
             _totalDue += (1 * due[feeKey] || 0);
         })
+        if (pmtNo > 1) {
+        }
+
         _totalDue = _totalDue.toFixed(2); // ad hoc to fix the check amount. 
         setPaidRent(dueRent);
         setDueFees(due);
         setPaidFees(due);
         setTotalDue(_totalDue);
-        setTotalPaid(0);
-        setCheckAmount(_totalDue);
+        //        setTotalPaid(0);
+        if (pmtNo === 1) {
+            setCheckAmount(_totalDue);
+        }
     }, []);
 
     useEffect(() => {
