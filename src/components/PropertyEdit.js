@@ -64,6 +64,8 @@ function PropertyEdit() {
     const [address, setAddress] = useState('');
     const [ledgerMonth, setLedgerMonth] = useState(currentMonth);
     const [ledgerYear, setLedgerYear] = useState(currentYear);
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
     const [recapMonth, setRecapMonth] = useState(_recapMonth);
     const [recapYear, setRecapYear] = useState(currentYear);
     const [defaultCheckDate, setDefaultCheckDate] = useState(getFirstDayOfNextMonth());
@@ -116,12 +118,16 @@ function PropertyEdit() {
 
     const handleMonthChange = event => {
         const month = event.target.value;
-        setRecapMonth(month);
+        //setRecapMonth(month);
+        setLedgerMonth(month);
+        setSelectedMonth(month);
     }
 
     const handleYearChange = event => {
-        const month = event.target.value;
-        setRecapYear(month);
+        const year = event.target.value;
+        //setRecapYear(month);
+        setLedgerYear(year);
+        setSelectedYear(year);
     }
 
     return (
@@ -139,17 +145,19 @@ function PropertyEdit() {
                 <label htmlFor="ledgerMonth">Payment Month:</label>
                 <select
                     id="ledgerMonth"
-                    value={ledgerMonth}
-                    onChange={(e) => setLedgerMonth(e.target.value)}
+                    value={selectedMonth}
+                    onChange={handleMonthChange}
                 >
+                    <option>Select</option>
                     {generateMonthOptions()}
                 </select>
                 <label htmlFor="ledgerMonth">Year:</label>
                 <select
                     id="ledgerYear"
-                    value={ledgerYear}
-                    onChange={(e) => setLedgerYear(e.target.value)}
+                    value={selectedYear}
+                    onChange={handleYearChange}
                 >
+                    <option>Select</option>
                     {generateYearOptions()}
                 </select>
 

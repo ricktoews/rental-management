@@ -33,6 +33,8 @@ const Properties = () => {
   const [tenantId, setTenantId] = useState(-1);
   const [ledgerRecord, setLedgerRecord] = useState({});
   const [paymentEntryData, setPaymentEntryData] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
   const navigate = useNavigate();
 
   const tenantInputRef = useRef();
@@ -125,12 +127,14 @@ const Properties = () => {
   const handleMonthChange = event => {
     const month = event.target.value;
     setLedgerMonth(month);
+    setSelectedMonth(month);
     updatePaymentEntryData(tenantId, ledgerYear, month);
   }
 
   const handleYearChange = event => {
     const year = event.target.value;
     setLedgerYear(year);
+    setSelectedYear(year);
     updatePaymentEntryData(tenantId, year, ledgerMonth);
   }
 
@@ -147,17 +151,17 @@ const Properties = () => {
           <label htmlFor="ledgerMonth">Payment Month:</label>
           <select
             id="ledgerMonth"
-            value={ledgerMonth}
             onChange={handleMonthChange}
           >
+            <option>Select</option>
             {generateMonthOptions()}
           </select>
           <label htmlFor="ledgerYear">Year:</label>
           <select
             id="ledgerYear"
-            value={ledgerYear}
             onChange={handleYearChange}
           >
+            <option>Select</option>
             {generateYearOptions()}
           </select>
 
