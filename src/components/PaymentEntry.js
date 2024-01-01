@@ -73,8 +73,6 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
             const feeKey = Object.keys(feeObj)[0];
             _totalDue += (1 * due[feeKey] || 0);
         })
-        if (pmtNo > 1) {
-        }
 
         _totalDue = _totalDue.toFixed(2); // ad hoc to fix the check amount. 
         setPaidRent(dueRent);
@@ -133,8 +131,13 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
     const handleSavePayment = async () => {
         if (!checkNumber || !checkAmount || Number.isNaN(checkAmount)) return;
 
+        let _totalDue = 1 * tenantRentAmount;
+
+        FEES.forEach(feeObj => {
+            const feeKey = Object.keys(feeObj)[0];
+            _totalDue += (1 * tenantMonthlyFees[feeKey] || 0);
+        })
         console.log('====> handleSaveLedger ledgerId', ledgerId, '; due', dueFees, '; paid', paidFees);
-        console.log('====> handleSaveLedger NEED LEDGER YEAR', ledgerYear);
         const payload = {
             ledger_id: ledgerId,
             tenant_id: tenantId,
@@ -142,6 +145,7 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
             ledger_month: ledgerMonth,
             due_rent: tenantRentAmount,
             due_fees: tenantMonthlyFees,
+            due_total: _totalDue,
 
             payment_ndx: paymentNdx,
             check_number: checkNumber,
