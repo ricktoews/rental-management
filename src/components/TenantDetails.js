@@ -112,6 +112,7 @@ const TenantDetails = () => {
                 break;
             case 'startingBalance':
                 setStartingBalance(1 * value);
+                break;
             case 'rentAdjustDate':
                 setRentAdjustDate(value);
         }

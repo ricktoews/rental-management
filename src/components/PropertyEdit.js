@@ -80,9 +80,9 @@ function PropertyEdit() {
         if (propertyId) {
             getPropertyById(propertyId)
                 .then(res => {
-                    const propertyFees = res.property_fees || {};
+                    const _propertyFees = res.property_fees || {};
                     setAddress(res.property_address);
-                    setPropertyFees(propertyFees);
+                    setPropertyFees(_propertyFees);
                     setUnits(res.units);
                 })
         }

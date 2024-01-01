@@ -16,7 +16,6 @@ function RentRecap() {
         if (propertyId && ledgerMonth && ledgerYear) {
             getRentRecap(propertyId, ledgerMonth, ledgerYear)
                 .then((data) => {
-                    console.log('====> Rent Recap data', data);
                     setAddress(data.address);
                     setRentRecapData(data);
                 })

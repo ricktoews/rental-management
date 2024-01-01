@@ -30,9 +30,8 @@ text-align: right;
 `;
 
 // unit includes the tenant rent and fees owned, from the tenants table.
-function LedgerEntry({ unit, ledgerData = {} }) {
+function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
     const { tenant_rent_amount, tenant_monthly_fees } = unit;
-    const { ledger_month, ledger_year } = ledgerData;
     const { due_rent, due_fees } = ledgerData;
     const [ledgerId, setLedgerId] = useState();
     const [dueRent, setDueRent] = useState(unit.tenant_rent_amount || 0);
@@ -68,10 +67,8 @@ function LedgerEntry({ unit, ledgerData = {} }) {
 
     useEffect(() => {
         if (refreshPayments) {
-            console.log('====> LedgerEntry, refreshPayments');
-            const ledgerYear = ledgerData.ledger_year;
-            const ledgerMonth = ledgerData.ledger_month;
-            const tenantIds = [ledgerData.tenant_id];
+            console.log('====> LedgerEntry, refreshPayments; ', ledgerYear, ledgerMonth, tenant_id);
+            const tenantIds = [tenant_id];
             getPayments(ledgerYear, ledgerMonth, tenantIds)
                 .then(res => {
                     const updatedLedger = res[0];
@@ -90,117 +87,7 @@ function LedgerEntry({ unit, ledgerData = {} }) {
         });
         return due;
     }
-    /*
-    
-        const addPayment = (newPayment) => {
-            setPayments((prevPayments) => [...prevPayments, newPayment]);
-        }
-    
-        useEffect(() => {
-            const due = getFeesForUnit(unit.tenant_monthly_fees);
-    
-            let _totalDue = 1 * dueRent;
-    
-            FEES.forEach(feeObj => {
-                const feeKey = Object.keys(feeObj)[0];
-                _totalDue += (1 * due[feeKey] || 0);
-            })
-            _totalDue = _totalDue.toFixed(2); // ad hoc to fix the check amount. 
-            setPaidRent(dueRent);
-            setDueFees(due);
-            setPaidFees(due);
-            setTotalDue(_totalDue);
-            setTotalPaid(0);
-            setCheckAmount(_totalDue);
-    
-            const payment = {
-                paidRent: 0,
-                paidFees: {},
-                lateFee: 0,
-                checkNumber: '',
-                checkAmount: 0,
-                checkDate: '',
-                ledgerNotes: ''
-            }
-    
-            addPayment(payment);
-        }, []);
-    
-        useEffect(() => {
-            if (ledgerData.ledger_id) {
-                setPayments([]);
-                const due = getFeesForUnit(due_fees);
-                setDueFees(due);
-                const paid = getFeesForUnit(ledgerData.paid_fees);
-                let _totalDue = 1 * due_rent;
-                FEES.forEach(feeObj => {
-                    const feeKey = Object.keys(feeObj)[0];
-                    _totalDue += (due[feeKey] || 0);
-                })
-                let _totalPaid = 1 * ledgerData.paid_rent + 1 * ledgerData.late_fee;
-                FEES.forEach(feeObj => {
-                    const feeKey = Object.keys(feeObj)[0];
-                    _totalPaid += (paid[feeKey] || 0);
-                })
-                setLedgerId(ledgerData.ledger_id);
-                setDueRent(1 * ledgerData.due_rent);
-                setPaidRent(1 * ledgerData.paid_rent);
-                setLateFee(1 * ledgerData.late_fee);
-                setDueFees(due);
-                setPaidFees(paid);
-                setCheckNumber(ledgerData.check_number);
-                setCheckAmount(ledgerData.check_amount);
-                setCheckDate(ledgerData.check_date);
-                setTotalDue(_totalDue);
-                setTotalPaid(_totalPaid);
-                setLedgerNotes(ledgerData.notes);
-                setLedgerDataEntered(true);
-    
-                setPayments(ledgerData.payments);
-            } else {
-    
-                setCheckNumber('');
-                setTotalPaid(0);
-                setPayments([]);
-            }
-    
-        }, [ledgerData.ledger_id])
-        */
-    /*
-        useEffect(() => {
-            if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
-                handleSaveLedger();
-                setCheckDataUpdate(false);
-                setIsDirty(false);
-            }
-        }, [checkDataUpdate]);
-    */
-    /*
-        const handleSaveLedger = () => {
-            if (!checkNumber || !checkAmount) return;
-    
-            console.log('====> handleSaveLedger ledgerId', ledgerId, 'Payment Ndx', paymentNdx, 'checkAmount', checkAmount);
-            //        console.log('====> handleSaveLedger due', dueFees, 'paid', paidFees);
-            const payload = {
-                tenant_id,
-                ledger_month,
-                ledger_year,
-                payment_ndx: paymentNdx,
-                check_number: checkNumber,
-                check_amount: 1 * checkAmount,
-                check_date: checkDate,
-                due_rent: 1 * dueRent,
-                paid_rent: 1 * paidRent,
-                late_fee: 1 * lateFee,
-                due_fees: dueFees,
-                paid_fees: paidFees,
-                notes: ledgerNotes
-    
-            };
-            console.log('====> handleSaveLedger', payload);
-            //        saveLedgerEntry(payload);
-        }
-    */
+
     const tenant_id = unit.tenant_id;
 
     return (<>
@@ -247,13 +134,13 @@ function LedgerEntry({ unit, ledgerData = {} }) {
             </tr>
             <tr><td colSpan="3"><table className="table">
                 {payments.map((pmt, key) => {
-                    console.log('====> Payments, from LedgerEntry', pmt);
                     return (
                         <PaymentEntry key={key}
+                            tenantId={tenant_id}
                             tenantRentAmount={due_rent}
                             tenantMonthlyFees={due_fees}
-                            ledgerMonth={ledger_month}
-                            ledgerYear={ledger_year}
+                            ledgerMonth={ledgerMonth}
+                            ledgerYear={ledgerYear}
                             ledgerId={ledgerId}
                             paymentNdx={key}
                             paymentData={pmt}
@@ -262,10 +149,11 @@ function LedgerEntry({ unit, ledgerData = {} }) {
                     );
                 })}
                 <PaymentEntry
+                    tenantId={tenant_id}
                     tenantRentAmount={tenant_rent_amount}
                     tenantMonthlyFees={tenant_monthly_fees}
-                    ledgerMonth={ledger_month}
-                    ledgerYear={ledger_year}
+                    ledgerMonth={ledgerMonth}
+                    ledgerYear={ledgerYear}
                     ledgerId={ledgerId}
                     paymentNdx={payments.length}
                     paymentData={{}}
