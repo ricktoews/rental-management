@@ -32,7 +32,8 @@ text-align: right;
 // unit includes the tenant rent and fees owned, from the tenants table.
 function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
     const { tenant_rent_amount, tenant_monthly_fees } = unit;
-    const { due_rent, due_fees } = ledgerData;
+    let due_fees = ledgerData.due_fees ? ledgerData.due_fees : tenant_monthly_fees;
+    let due_rent = ledgerData.due_rent ? ledgerData.due_rent : tenant_rent_amount;
     const [ledgerId, setLedgerId] = useState();
     const [dueRent, setDueRent] = useState(unit.tenant_rent_amount || 0);
     const [dueFees, setDueFees] = useState(unit.tenant_monthly_fees || {});

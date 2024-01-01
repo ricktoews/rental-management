@@ -178,8 +178,8 @@ const Properties = () => {
         {paymentEntryData.tenant_id && <table className="unit-payments table table-striped">
           <LedgerEntry
             unit={paymentEntryData.unit}
-            ledgerMonth={paymentEntryData.ledgerMonth}
-            ledgerYear={paymentEntryData.ledgerYear}
+            ledgerMonth={ledgerMonth}
+            ledgerYear={ledgerYear}
             ledgerData={paymentEntryData.ledgerData}
             propertyFees={paymentEntryData.propertyFees}
             feeCharged={paymentEntryData.feeCharged}

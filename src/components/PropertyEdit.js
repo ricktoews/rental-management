@@ -86,6 +86,7 @@ function PropertyEdit() {
                     setAddress(res.property_address);
                     setPropertyFees(_propertyFees);
                     setUnits(res.units);
+                    console.log('====> Property by Id, unit data', res.units);
                 })
         }
     }, [propertyId]);
