@@ -10,6 +10,7 @@ function RentRecap() {
     const [address, setAddress] = useState('');
     const [rentRecapData, setRentRecapData] = useState({});
     let balance = 0;
+    let totalReceived = 0;
 
     useEffect(() => {
         // Fetch ledger card data when the component loads
@@ -54,6 +55,7 @@ function RentRecap() {
                         if (entry.payments && entry.payments.length > 0) {
                             return entry.payments.map((ledgerRow, ledgerKey) => {
                                 balance -= ledgerRow.check_amount;
+                                totalReceived += ledgerRow.check_amount;
                                 if (ledgerKey === 0)
                                     return (
                                         <tr key={ledgerKey}>
@@ -98,6 +100,16 @@ function RentRecap() {
 
                         }
                     })}
+                    <tr style={{ borderTop: '2px solid green' }}>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td style={{ textAlign: 'right' }}>Total Received</td>
+                        <td style={{ textAlign: 'right' }}>{format$(totalReceived)}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
 
