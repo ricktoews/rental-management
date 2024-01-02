@@ -137,7 +137,7 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
             const feeKey = Object.keys(feeObj)[0];
             _totalDue += (1 * tenantMonthlyFees[feeKey] || 0);
         })
-        console.log('====> handleSaveLedger ledgerId', ledgerId, '; due', dueFees, '; paid', paidFees);
+
         const payload = {
             ledger_id: ledgerId,
             tenant_id: tenantId,
@@ -156,7 +156,7 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
             paid_fees: paidFees,
             notes: paymentNotes
         };
-        console.log('====> handleSavePayment', payload);
+
         await savePaymentRecord(payload);
         setRefreshPayments(true);
     }

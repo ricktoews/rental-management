@@ -51,36 +51,52 @@ function RentRecap() {
                 <tbody>
                     {rentRecapData.unitData.map((entry, key) => {
                         let balance = entry.starting_balance + entry.due_total;
-                        return entry.payments.map((ledgerRow, ledgerKey) => {
-                            balance -= ledgerRow.check_amount;
-                            if (ledgerKey === 0)
-                                return (
-                                    <tr key={ledgerKey}>
-                                        <td>{entry.unit_number}</td>
-                                        <td>{entry.first_name}</td>
-                                        <td>{entry.last_name}</td>
-                                        <td style={{ textAlign: 'right' }}>{format$(entry.due_total)}</td>
-                                        <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
-                                        <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
-                                        <td>{ledgerRow.check_date}</td>
-                                        <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
-                                    </tr>
-                                )
-                            else
-                                return (
-                                    <tr key={ledgerKey}>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td style={{ textAlign: 'right' }}></td>
-                                        <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
-                                        <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
-                                        <td>{ledgerRow.check_date}</td>
-                                        <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
-                                    </tr>
-                                )
+                        if (entry.payments && entry.payments.length > 0) {
+                            return entry.payments.map((ledgerRow, ledgerKey) => {
+                                balance -= ledgerRow.check_amount;
+                                if (ledgerKey === 0)
+                                    return (
+                                        <tr key={ledgerKey}>
+                                            <td>{entry.unit_number}</td>
+                                            <td>{entry.first_name}</td>
+                                            <td>{entry.last_name}</td>
+                                            <td style={{ textAlign: 'right' }}>{format$(entry.due_total)}</td>
+                                            <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
+                                            <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
+                                            <td>{ledgerRow.check_date}</td>
+                                            <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
+                                        </tr>
+                                    )
+                                else
+                                    return (
+                                        <tr key={ledgerKey}>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style={{ textAlign: 'right' }}></td>
+                                            <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
+                                            <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
+                                            <td>{ledgerRow.check_date}</td>
+                                            <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
+                                        </tr>
+                                    )
+                            })
+                        }
+                        else {
+                            return (
+                                <tr key={key}>
+                                    <td>{entry.unit_number}</td>
+                                    <td>{entry.first_name}</td>
+                                    <td>{entry.last_name}</td>
+                                    <td style={{ textAlign: 'right' }}>{format$(entry.due_total)}</td>
+                                    <td style={{ textAlign: 'right' }}>NOT RECEIVED</td>
+                                    <td style={{ textAlign: 'center' }}></td>
+                                    <td></td>
+                                    <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
+                                </tr>
+                            )
 
-                        })
+                        }
                     })}
                 </tbody>
             </table>
