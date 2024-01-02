@@ -141,6 +141,7 @@ function PropertyEdit() {
             <hr />
 
             {/* Payment Month Dropdown */}
+            {/*
             <div className="month-selector">
                 <label htmlFor="ledgerMonth">Payment Month:</label>
                 <select
@@ -162,6 +163,7 @@ function PropertyEdit() {
                 </select>
 
             </div>
+            */}
 
             {/* Units Table */}
             {units.length > 0 && <table className="unit-payments table table-striped">
