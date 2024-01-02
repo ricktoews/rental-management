@@ -69,6 +69,11 @@ const Properties = () => {
     }
   }
 
+  const handleTenantSearchFocus = event => {
+    // This causes the tenant data block to go away, so you can searcy by tenant again.
+    setPaymentEntryData({});
+  }
+
   const updatePaymentEntryData = (tenantId, year, month) => {
     console.log('====> updatePaymentEntryData year', year);
     getPaymentEntryData(tenantId, year, month)
@@ -147,6 +152,7 @@ const Properties = () => {
 
       <div style={{ position: 'relative' }} className="tenant-dropdown-container">
         {/* Payment Month Dropdown */}
+        {/*
         <div className="month-selector">
           <label htmlFor="ledgerMonth">Payment Month:</label>
           <select
@@ -166,8 +172,8 @@ const Properties = () => {
           </select>
 
         </div>
-
-        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} /> <button onClick={handleAddTenantButton} className="btn btn-warning">+</button>
+*/}
+        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} onFocus={handleTenantSearchFocus} /> <button onClick={handleAddTenantButton} className="btn btn-warning">+</button>
 
         <div ref={tenantDropdownRef} style={{ display: 'none', position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
           {filteredTenants.map((item, key) => {
