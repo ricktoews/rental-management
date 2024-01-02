@@ -119,15 +119,6 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
         }
     }, [paymentData])
 
-    useEffect(() => {
-        if (isDirty && checkDataUpdate && checkNumber && checkAmount && checkDate) {
-            //console.log('====> Check information', checkAmount, checkNumber, checkDate);
-            handleSavePayment();
-            setCheckDataUpdate(false);
-            setIsDirty(false);
-        }
-    }, [isDirty, checkDataUpdate, checkDataUpdate, checkNumber, checkAmount]);
-
     const handleSavePayment = async () => {
         if (!checkNumber || !checkAmount || Number.isNaN(checkAmount)) return;
 
@@ -219,10 +210,17 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
     }
 
     const handleSaveIfDirty = e => {
-        console.log('====> if dirty, save', isDirty);
         if (isDirty) {
             setCheckDataUpdate(true);
         }
+    }
+
+    const handleSaveButton = async e => {
+        console.log('====> handleSaveButton');
+        await handleSavePayment();
+        setCheckDataUpdate(false);
+        setIsDirty(false);
+        setRefreshPayments(true);
     }
 
     const handleDeletePayment = async ndx => {
@@ -242,10 +240,12 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
     return <tbody data-paymentblock={paymentNdx}>
         <tr className="table-success">
             <td>
-                <button onClick={e => { handleDeletePayment(paymentNdx) }} style={{ marginRight: '10px' }} className="btn btn-warning">Delete</button>
+                {checkNumber && <button onClick={e => { handleDeletePayment(paymentNdx) }} style={{ marginRight: '10px' }} className="btn btn-warning">Delete</button>}
                 Payment {pmtNo}: $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
             <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
-            <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} /></td>
+            <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} />
+                <button onClick={handleSaveButton} style={{ marginLeft: '10px' }} className="btn btn-warning">Save</button>
+            </td>
         </tr>
         <tr>
             <td colSpan="3">

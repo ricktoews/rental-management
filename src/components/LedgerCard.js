@@ -81,10 +81,8 @@ function LedgerCard() {
                     </tr>
                 </tbody>
                 {ledgerData.ledger_months.map((entry, key) => {
-                    console.log('====> Ledger Card entry', entry);
                     balance = balance + entry.due_total;
                     //const balance2 = balance1 - entry.check_amount;
-
 
                     return (
                         <tbody key={key}>
@@ -97,9 +95,9 @@ function LedgerCard() {
                                 <td></td>
                                 <td>{format$(balance)}</td>
                             </tr>
-                            {entry.payments.map(payment => {
+                            {entry.payments.map((payment, pmtKey) => {
                                 balance -= payment.check_amount;
-                                return <LedgerCardPayment balance={balance} ledgerData={ledgerData} payment={payment} entry={entry} />
+                                return <LedgerCardPayment key={pmtKey} balance={balance} ledgerData={ledgerData} payment={payment} entry={entry} />
                             })}
                             {/*
                             <tr>
