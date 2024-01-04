@@ -173,7 +173,9 @@ const Properties = () => {
 
         </div>
 */}
-        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} onFocus={handleTenantSearchFocus} /> <button onClick={handleAddTenantButton} className="btn btn-warning">+</button>
+        <label style={{ width: '60px' }}>Tenant:</label> <input type="text" style={tenantSearchStyle} onChange={handleTenantSearch} onFocus={handleTenantSearchFocus} />
+
+        <button onClick={handleAddTenantButton} style={{ marginLeft: '10px' }} className="btn btn-warning">Add Tenant</button>
 
         <div ref={tenantDropdownRef} style={{ display: 'none', position: 'absolute', top: 'calc(100% + 2px)', left: '64px', width: '200px', height: '100px', padding: '5px', border: '1px solid #ccc', background: '#fff', overflowY: 'auto' }} className="tenant-dropdown-wrapper">
           {filteredTenants.map((item, key) => {

@@ -74,7 +74,9 @@ const TenantDetails = () => {
 
 
     const saveTenantDetails = async () => {
-        const unit_id = unitSelectionRef.current?.value || unitId;
+        let unit_id = unitSelectionRef.current?.value || unitId;
+        unit_id = isNaN(parseInt(unit_id, 10)) ? '' : parseInt(unit_id, 10);
+
         const details = {
             unit_id,
             first_name: firstName,
