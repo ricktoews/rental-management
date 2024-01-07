@@ -1,4 +1,4 @@
-import { format$ } from "../utils/helpers";
+import { readableDateFormat } from "../utils/helpers";
 import { FEES } from "../config/constants";
 
 export const getFeeHeadings = firstRowFees => {
@@ -39,4 +39,10 @@ export const processLedgerData = rows => {
         table_data.push(row_data);
     });
     return table_data;
+}
+
+export const fmtLedgerDate = (year, month) => {
+    console.log('====> ledgerDate', year, month);
+    const ledgerDate = `${year}-${month}-01`;
+    return readableDateFormat(ledgerDate);
 }

@@ -243,7 +243,7 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
                 {checkNumber && <button onClick={e => { handleDeletePayment(paymentNdx) }} style={{ marginRight: '10px' }} className="btn btn-warning">Delete</button>}
                 Payment {pmtNo}: $<PaymentInput data-check="amount" onBlur={handleSaveIfDirty} onChange={handleCheckAmount} value={checkAmount} /></td>
             <td>Check # <CheckNoInput data-check="number" onBlur={handleSaveIfDirty} onChange={handleCheckNumber} value={checkNumber} /></td>
-            <td>Check Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} />
+            <td>Date <CheckDateInput data-check="date" onBlur={handleSaveIfDirty} onChange={handleCheckDate} value={checkDate} />
                 <button onClick={handleSaveButton} style={{ marginLeft: '10px' }} className="btn btn-warning">Save</button>
             </td>
         </tr>

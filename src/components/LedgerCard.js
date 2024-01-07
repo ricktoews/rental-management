@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getLedgerCard } from '../utils/apis.js';
-import { format$ } from '../utils/helpers.js';
+import { format$, readableDateFormat } from '../utils/helpers.js';
+import { fmtLedgerDate } from './LedgerCardUtils.js';
 
 function LedgerCardPayment(props) {
     const { ledgerData, payment, entry } = props;
     let balance = props.balance;
+    const fmtCheckDate = readableDateFormat(payment.check_date);
 
     return (<>
         <tr>
             <td>{ledgerData.first_name}</td>
             <td>{ledgerData.last_name}</td>
-            <td>{payment.check_date}</td>
+            <td>{fmtCheckDate}</td>
             <td></td>
             <td>{format$(payment.check_amount)}</td>
             <td>{payment.check_number}</td>
@@ -82,14 +84,13 @@ function LedgerCard() {
                 </tbody>
                 {ledgerData.ledger_months.map((entry, key) => {
                     balance = balance + entry.due_total;
-                    //const balance2 = balance1 - entry.check_amount;
-
+                    const ledgerDate = fmtLedgerDate(entry.ledger_year, entry.ledger_month);
                     return (
                         <tbody key={key}>
                             <tr>
                                 <td>{ledgerData.first_name}</td>
                                 <td>{ledgerData.last_name}</td>
-                                <td>{entry.check_date}</td>
+                                <td>{ledgerDate}</td>
                                 <td>{format$(entry.due_total)}</td>
                                 <td></td>
                                 <td></td>
@@ -99,25 +100,6 @@ function LedgerCard() {
                                 balance -= payment.check_amount;
                                 return <LedgerCardPayment key={pmtKey} balance={balance} ledgerData={ledgerData} payment={payment} entry={entry} />
                             })}
-                            {/*
-                            <tr>
-                                <td>{ledgerData.first_name}</td>
-                                <td>{ledgerData.last_name}</td>
-                                <td>{entry.check_date}</td>
-                                <td></td>
-                                <td>{format$(entry.check_amount)}</td>
-                                <td>{entry.check_number}</td>
-                                <td>{format$(balance2)}</td>
-                            </tr>
-                            {entry.notes && (
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td colSpan="4">{entry.notes}</td>
-                                </tr>
-                            )}
-                            */}
                         </tbody>
                     )
                 })}

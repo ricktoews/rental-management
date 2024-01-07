@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRentRecap } from '../utils/apis.js';
-import { format$ } from '../utils/helpers.js';
+import { format$, readableDateFormat } from '../utils/helpers.js';
 import { processLedgerData } from './LedgerCardUtils.js';
 import { MONTH_NAMES } from '../config/constants';
 
@@ -56,6 +56,7 @@ function RentRecap() {
                             return entry.payments.map((ledgerRow, ledgerKey) => {
                                 balance -= ledgerRow.check_amount;
                                 totalReceived += ledgerRow.check_amount;
+                                const fmtCheckDate = readableDateFormat(ledgerRow.check_date);
                                 if (ledgerKey === 0)
                                     return (
                                         <tr key={ledgerKey}>
@@ -65,7 +66,7 @@ function RentRecap() {
                                             <td style={{ textAlign: 'right' }}>{format$(entry.due_total)}</td>
                                             <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
                                             <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
-                                            <td>{ledgerRow.check_date}</td>
+                                            <td>{fmtCheckDate}</td>
                                             <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
                                         </tr>
                                     )
@@ -78,7 +79,7 @@ function RentRecap() {
                                             <td style={{ textAlign: 'right' }}></td>
                                             <td style={{ textAlign: 'right' }}>{format$(ledgerRow.check_amount)}</td>
                                             <td style={{ textAlign: 'center' }}>{ledgerRow.check_number}</td>
-                                            <td>{ledgerRow.check_date}</td>
+                                            <td>{fmtCheckDate}</td>
                                             <td style={{ textAlign: 'right' }}>{format$(balance)}</td>
                                         </tr>
                                     )

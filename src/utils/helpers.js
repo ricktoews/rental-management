@@ -7,8 +7,8 @@ export const format$ = amt => {
 }
 
 export function getDefaultCheckDate(year, month) {
-	let fmtCheckDate = '';
-	if (year === undefined || month === undefined) return fmtCheckDate;
+    let fmtCheckDate = '';
+    if (year === undefined || month === undefined) return fmtCheckDate;
 
     const checkDate = new Date(year, month - 1, 1);
     fmtCheckDate = checkDate.toISOString().substring(0, 10);
@@ -55,3 +55,9 @@ export const generateYearOptions = () => {
     });
 };
 
+export const readableDateFormat = (inputDate) => {
+    const [year, month, date] = inputDate.split('-');
+    const monthName = MONTH_NAMES[month - 1].substring(0, 3);
+    const formattedDate = `${monthName} ${date}, ${year}`;
+    return formattedDate;
+}
