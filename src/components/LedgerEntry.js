@@ -73,6 +73,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
                 .then(res => {
                     const updatedLedger = res[0];
                     setPayments(updatedLedger.payments);
+                    setLedgerId(updatedLedger.ledger_id);
                     setRefreshPayments(false);
                 });
         }
