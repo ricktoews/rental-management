@@ -57,13 +57,23 @@ const Properties = () => {
   };
 
 
+  const tenantSearchFilter = str => {
+    return item => {
+      let last_names = item.last_name.replace('&', ' ').replace(/\s+/, ' ').split(' ');
+      let filtered = false;
+      last_names.forEach(last_name => {
+        filtered = filtered || last_name.toLowerCase().substring(0, str.length) == str.toLowerCase();
+      })
+      return filtered;
+    }
+  }
 
 
   const handleTenantSearch = event => {
     const el = event.currentTarget;
     const value = el.value || '';
     if (value.length >= 1) {
-      const _filteredTenants = tenants.filter(item => item.last_name.toLowerCase().substring(0, value.length) == value.toLowerCase())
+      const _filteredTenants = tenants.filter(tenantSearchFilter(value));
       setFilteredTenants(_filteredTenants);
       tenantDropdownRef.current.style.display = 'block';
     }
