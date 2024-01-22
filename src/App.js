@@ -8,7 +8,9 @@ import Properties from './components/Properties';
 import PropertyDropdown from './components/PropertyDropdown';
 import LedgerCard from './components/LedgerCard';
 import RentRecap from './components/RentRecap';
+import RentRecapAll from './components/RentRecapAll';
 import TenantDetails from './components/TenantDetails';
+import TableMaint from './maint/TableMaint';
 
 function App() {
   const [menuState, setMenuState] = useState(false);
@@ -94,9 +96,11 @@ function App() {
         <div className="container app-content">
           <Routes>
             <Route path="/" element={<Properties />} />
+            <Route path="/table-maint/:table" element={<TableMaint />} />
             <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
             <Route path="/ledger-card/:tenantId" element={<LedgerCard />} />
             <Route path="/rent-recap/:propertyId/:ledgerMonth/:ledgerYear" element={<RentRecap />} />
+            <Route path="/rent-recap-all/:ledgerMonth/:ledgerYear" element={<RentRecapAll />} />
             <Route path="/properties" element={<PropertyDropdown />} />
             <Route path="/tenant-details/:tenant_id" element={<TenantDetails />} />
           </Routes>

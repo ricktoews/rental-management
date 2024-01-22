@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { getTenants, getProperties, getPaymentEntryData } from '../utils/apis';
 import LedgerEntry from './LedgerEntry';
@@ -192,6 +193,11 @@ const Properties = () => {
             return <div key={key} data-id={item.tenant_id} onClick={handleTenantClick} style={{ cursor: 'pointer', borderBottom: '1px solid #ccc' }}>{item.last_name}, {item.first_name}</div>
           })}
         </div>
+
+        <div>
+          <Link to={`/rent-recap-all/${ledgerMonth}/${ledgerYear}`}>Rent Recap All Properties</Link>
+        </div>
+
         {/* Units Table */}
         {paymentEntryData.tenant_id && <table className="unit-payments table table-striped">
           <LedgerEntry

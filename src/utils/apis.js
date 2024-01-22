@@ -333,3 +333,19 @@ export const getRentRecap = async (property_id, ledger_month, ledger_year) => {
     }
 }
 
+export const getRentRecapAll = async (ledger_month, ledger_year) => {
+    try {
+        const response = await fetch(`${REST.getRentRecapAll}/${ledger_month}/${ledger_year}`);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+}
+
