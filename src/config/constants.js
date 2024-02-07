@@ -17,6 +17,7 @@ export const REST = {
     getPayments: API_BASE + '/get-payments',
     getPaymentEntryData: API_BASE + '/payment-entry',
     getLedgerCard: API_BASE + '/ledger-card/',
+    getPropertyLedgerCards: API_BASE + '/ledger-cards-property/',
     getRentRecap: API_BASE + '/rent-recap',
     getRentRecapAll: API_BASE + '/rent-recap-all',
 };

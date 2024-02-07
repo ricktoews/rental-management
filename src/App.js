@@ -7,6 +7,7 @@ import PropertyEdit from './components/PropertyEdit';
 import Properties from './components/Properties';
 import PropertyDropdown from './components/PropertyDropdown';
 import LedgerCard from './components/LedgerCard';
+import PropertyLedgerCards from './components/PropertyLedgerCards';
 import RentRecap from './components/RentRecap';
 import RentRecapAll from './components/RentRecapAll';
 import TenantDetails from './components/TenantDetails';
@@ -99,6 +100,7 @@ function App() {
             <Route path="/table-maint/:table" element={<TableMaint />} />
             <Route path="/property/edit/:propertyId" element={<PropertyEdit />} />
             <Route path="/ledger-card/:tenantId" element={<LedgerCard />} />
+            <Route path="/property-ledger-cards/:propertyId" element={<PropertyLedgerCards />} />
             <Route path="/rent-recap/:propertyId/:ledgerMonth/:ledgerYear" element={<RentRecap />} />
             <Route path="/rent-recap-all/:ledgerMonth/:ledgerYear" element={<RentRecapAll />} />
             <Route path="/properties" element={<PropertyDropdown />} />

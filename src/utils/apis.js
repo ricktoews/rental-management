@@ -300,9 +300,26 @@ export const getPaymentEntryData = async (tenant_id, ledger_year, ledger_month) 
     }
 }
 
-export const getLedgerCard = async (unit_id) => {
+export const getLedgerCard = async (tenant_id) => {
     try {
-        const response = await fetch(REST.getLedgerCard + unit_id);
+        const response = await fetch(REST.getLedgerCard + tenant_id);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throwing the error to allow handling it at the call site
+    }
+
+}
+
+export const getPropertyLedgerCards = async (property_id) => {
+    try {
+        const response = await fetch(REST.getPropertyLedgerCards + property_id);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');

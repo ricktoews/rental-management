@@ -137,7 +137,10 @@ function PropertyEdit() {
             <h2>{address}</h2>
 
 
-            <Link to={`/rent-recap/${propertyId}/${ledgerMonth}/${ledgerYear}`}>Rent Recap</Link>
+            <p><Link to={`/rent-recap/${propertyId}/${ledgerMonth}/${ledgerYear}`}>Rent Recap</Link></p>
+
+            <p><Link to={`/property-ledger-cards/${propertyId}`}>Ledger Cards for Property</Link></p>
+
             <hr />
 
             {/* Payment Month Dropdown */}
