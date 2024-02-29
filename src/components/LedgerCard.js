@@ -72,6 +72,17 @@ function LedgerCard() {
                     </tr>
                 </thead>
                 <tbody>
+                    { ledgerData.security_deposit > 0 && (
+                    <tr>
+                        <td>{ledgerData.first_name}</td>
+                        <td>{ledgerData.last_name}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Security deposit</td>
+                        <td>{format$(ledgerData.security_deposit)}</td>
+                    </tr>
+                    )}
                     <tr>
                         <td>{ledgerData.first_name}</td>
                         <td>{ledgerData.last_name}</td>

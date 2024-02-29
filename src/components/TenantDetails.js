@@ -31,6 +31,7 @@ const TenantDetails = () => {
     const [rent, setRent] = useState(0);
     const [fees, setFees] = useState({});
     const [startingBalance, setStartingBalance] = useState(0);
+    const [securityDeposit, setSecurityDeposit] = useState(0);
     const [rentAdjustDate, setRentAdjustDate] = useState('');
     const [unitId, setUnitId] = useState();
     const [vacantUnits, setVacantUnits] = useState([]);
@@ -59,6 +60,7 @@ const TenantDetails = () => {
                 setRent(tenantData.rent_amount || 0);
                 setFees(tenantData.monthly_fees || {});
                 setStartingBalance(tenantData.starting_balance || 0);
+                setSecurityDeposit(tenantData.security_deposit || 0);
                 setRentAdjustDate(tenantData.rent_adjust_date || '');
             })
     }, [unitId]);
@@ -114,6 +116,9 @@ const TenantDetails = () => {
                 break;
             case 'startingBalance':
                 setStartingBalance(value);
+                break;
+            case 'securityDeposit':
+                setSecurityDeposit(value);
                 break;
             case 'rentAdjustDate':
                 setRentAdjustDate(value);
@@ -213,10 +218,10 @@ const TenantDetails = () => {
                     </tr>
                     <tr className="table-success">
                         <td>Rent Adjust Date</td>
-                        <td></td>
+                        <td>Security Deposit</td>
                     </tr><tr>
                         <td><input type="text" data-field="rentAdjustDate" onChange={handleChange} value={rentAdjustDate} /></td>
-                        <td></td>
+                        <td><input type="text" data-field="securityDeposit" onChange={handleChange} value={securityDeposit} /></td>
                     </tr>
 
                 </tbody>
