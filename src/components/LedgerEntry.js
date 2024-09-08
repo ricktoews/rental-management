@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
 import { format$, getDefaultCheckDate, getFirstDayOfNextMonth } from "../utils/helpers";
+import LedgerMonthDropdown from "./LedgerMonthDropdown";
 import PaymentEntry from "./PaymentEntry";
 import { saveLedgerEntry, getPayments } from '../utils/apis';
 import { FEES } from "../config/constants";
@@ -29,6 +30,7 @@ const Money = styled.td`
 text-align: right;
 `;
 
+
 // unit includes the tenant rent and fees owned, from the tenants table.
 function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
     const { tenant_rent_amount, tenant_monthly_fees } = unit;
@@ -39,6 +41,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
     const [dueFees, setDueFees] = useState(unit.tenant_monthly_fees || {});
     const [totalDue, setTotalDue] = useState('');
     const [refreshPayments, setRefreshPayments] = useState(false);
+    const [paymentLedgerMonth, setPaymentLedgerMonth] = useState(ledgerMonth);
+    const [paymentLedgerYear, setPaymentLedgerYear] = useState(ledgerYear);
 
     const [balance, setBalance] = useState(0);
     const [payments, setPayments] = useState([]);
@@ -71,10 +75,12 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
             const tenantIds = [tenant_id];
             getPayments(ledgerYear, ledgerMonth, tenantIds)
                 .then(res => {
-                    const updatedLedger = res[0];
-                    setPayments(updatedLedger.payments);
-                    setLedgerId(updatedLedger.ledger_id);
-                    setRefreshPayments(false);
+                    if (res.length > 0) {
+                        const updatedLedger = res[0];
+                        setPayments(updatedLedger.payments);
+                        setLedgerId(updatedLedger.ledger_id);
+                        setRefreshPayments(false);
+                    }
                 });
         }
     }, [refreshPayments])
@@ -90,13 +96,17 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
 
     const tenant_id = unit.tenant_id;
 
+    const adjustLedgerMonth = {
+        setPaymentLedgerMonth,
+        setPaymentLedgerYear
+    }
     return (<>
         <tbody className="ledger-entry">
             <tr>
                 <td colSpan="3"><b>Unit {unit.unit_number}</b>: <Link to={`/tenant-details/${unit.tenant_id}`}>{unit.first_name} {unit.last_name}</Link> <Link to={`/ledger-card/${unit.tenant_id}`}>Ledger Card</Link></td>
             </tr>
             <tr className="table-success">
-                <td colSpan="3">Due this month: {format$(totalDue)}</td>
+                <td colSpan="3"><LedgerMonthDropdown adjustLedgerMonth={adjustLedgerMonth} ledgerMonth={ledgerMonth} ledgerYear={ledgerYear} totalDue={format$(totalDue)} /></td>
             </tr>
             <tr>
                 <td colSpan="3">
@@ -139,8 +149,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
                             tenantId={tenant_id}
                             tenantRentAmount={due_rent}
                             tenantMonthlyFees={due_fees}
-                            ledgerMonth={ledgerMonth}
-                            ledgerYear={ledgerYear}
+                            ledgerMonth={paymentLedgerMonth}
+                            ledgerYear={paymentLedgerYear}
                             ledgerId={ledgerId}
                             paymentNdx={key}
                             paymentData={pmt}
@@ -152,8 +162,8 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
                     tenantId={tenant_id}
                     tenantRentAmount={tenant_rent_amount}
                     tenantMonthlyFees={tenant_monthly_fees}
-                    ledgerMonth={ledgerMonth}
-                    ledgerYear={ledgerYear}
+                    ledgerMonth={paymentLedgerMonth}
+                    ledgerYear={paymentLedgerYear}
                     ledgerId={ledgerId}
                     paymentNdx={payments.length}
                     paymentData={{}}
