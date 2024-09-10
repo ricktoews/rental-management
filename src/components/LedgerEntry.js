@@ -32,7 +32,7 @@ text-align: right;
 
 
 // unit includes the tenant rent and fees owned, from the tenants table.
-function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
+function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {}, updateLedgerMonth = {} }) {
     const { tenant_rent_amount, tenant_monthly_fees } = unit;
     let due_fees = ledgerData.due_fees ? ledgerData.due_fees : tenant_monthly_fees;
     let due_rent = ledgerData.due_rent ? ledgerData.due_rent : tenant_rent_amount;
@@ -46,6 +46,12 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
 
     const [balance, setBalance] = useState(0);
     const [payments, setPayments] = useState([]);
+
+    useEffect(() => {
+        if (paymentLedgerMonth !== ledgerMonth) {
+            updateLedgerMonth(paymentLedgerMonth, paymentLedgerYear, unit.tenant_id);
+        }
+    }, [paymentLedgerMonth, paymentLedgerYear]);
 
     useEffect(() => {
         setLedgerId(ledgerData.ledger_id);
@@ -66,7 +72,9 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
     useEffect(() => {
         if (ledgerData.payments) {
             setPayments(ledgerData.payments);
-
+        }
+        else {
+            setPayments([]);
         }
     }, [ledgerData.payments]);
 
@@ -100,6 +108,7 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {} }) {
         setPaymentLedgerMonth,
         setPaymentLedgerYear
     }
+
     return (<>
         <tbody className="ledger-entry">
             <tr>

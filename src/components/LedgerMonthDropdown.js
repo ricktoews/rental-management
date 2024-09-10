@@ -2,12 +2,11 @@ import React from 'react';
 
 const LedgerMonthDropdown = ({ adjustLedgerMonth, ledgerMonth, ledgerYear, totalDue }) => {
     const { setPaymentLedgerMonth, setPaymentLedgerYear } = adjustLedgerMonth;
-    console.log('====> ledger month, year', ledgerMonth, ledgerYear);
+
     const handleLedgerMonthChange = e => {
         // Extract month and year from the selected value
         const [selectedMonth, selectedYear] = e.target.value.split(',').map(Number);
         // Call the handler to set the selected month and year
-        console.log('====> selected month, year', selectedMonth, selectedYear);
         setPaymentLedgerMonth(selectedMonth);
         setPaymentLedgerYear(selectedYear);
     }

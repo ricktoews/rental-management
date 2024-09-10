@@ -108,6 +108,7 @@ function PropertyEdit() {
         }
     }, [units])
 
+
     const handleFeeChange = e => {
         const field = e.currentTarget;
         const feeProperty = field.dataset.fee;
@@ -130,6 +131,23 @@ function PropertyEdit() {
         setSelectedYear(year);
     }
 
+    const updateLedgerMonth = (ledgerMonth, ledgerYear, tenantId) => {
+        getPayments(ledgerYear, ledgerMonth, [tenantId])
+            .then(res => {
+                const _ledgerData = ledgerData.slice(0);
+                const ledgerForTenantMonth = res.length > 0 ? res[0] : null;
+                for (let ndx = 0; ndx < _ledgerData.length; ndx++) {
+                    if (_ledgerData[ndx].tenant_id == tenantId) {
+                        if (ledgerForTenantMonth) {
+                            _ledgerData[ndx] = ledgerForTenantMonth;
+                        } else {
+                            _ledgerData[ndx].payments = [];
+                        }
+                    }
+                }
+                setLedgerData(_ledgerData);
+            });
+    }
     return (
         <div>
             <Link to="/">Return to Property List</Link>
@@ -143,31 +161,6 @@ function PropertyEdit() {
 
             <hr />
 
-            {/* Payment Month Dropdown */}
-            {/*
-            <div className="month-selector">
-                <label htmlFor="ledgerMonth">Payment Month:</label>
-                <select
-                    id="ledgerMonth"
-                    value={selectedMonth}
-                    onChange={handleMonthChange}
-                >
-                    <option>Select</option>
-                    {generateMonthOptions()}
-                </select>
-                <label htmlFor="ledgerMonth">Year:</label>
-                <select
-                    id="ledgerYear"
-                    value={selectedYear}
-                    onChange={handleYearChange}
-                >
-                    <option>Select</option>
-                    {generateYearOptions()}
-                </select>
-
-            </div>
-            */}
-
             {/* Units Table */}
             {units.length > 0 && <table className="unit-payments table table-striped">
                 {units.filter(unit => unit.tenant_id).map((unit, idx) => {
@@ -179,6 +172,7 @@ function PropertyEdit() {
                         ledgerYear={ledgerYear}
                         ledgerData={ledgerRecord}
                         propertyFees={propertyFees}
+                        updateLedgerMonth={updateLedgerMonth}
                     />;
 
                 })}

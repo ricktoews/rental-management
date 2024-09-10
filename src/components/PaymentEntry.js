@@ -41,9 +41,6 @@ function PaymentEntry({ tenantId, tenantRentAmount, tenantMonthlyFees, ledgerMon
     const [totalDue, setTotalDue] = useState('');
     const [totalPaid, setTotalPaid] = useState('');
     const [paymentDataEntered, setPaymentDataEntered] = useState(false);
-    if (!tenantMonthlyFees) {
-        console.log('====> PaymentEntry tenantMonthlyFees', tenantMonthlyFees);
-    }
     const calcTotalPaid = () => {
         let total = 1 * paidRent + 1 * lateFee;
         FEES.forEach(feeObj => {
