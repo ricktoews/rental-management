@@ -42,7 +42,6 @@ export const processLedgerData = rows => {
 }
 
 export const fmtLedgerDate = (year, month) => {
-    console.log('====> ledgerDate', year, month);
     const ledgerDate = `${year}-${month}-01`;
     return readableDateFormat(ledgerDate);
 }
