@@ -135,7 +135,7 @@ function PropertyEdit() {
         getPayments(ledgerYear, ledgerMonth, [tenantId])
             .then(res => {
                 const ledgerForTenantMonth = res.length > 0 ? res[0] : null;
-                const _ledgerData = ledgerData.length > 0 ? ledgerData.slice(0) : [ledgerForTenantMonth];
+                const _ledgerData = ledgerData.length > 0 ? ledgerData.slice(0) : ledgerForTenantMonth ? [ledgerForTenantMonth] : [];
                 for (let ndx = 0; ndx < _ledgerData.length; ndx++) {
                     if (_ledgerData[ndx].tenant_id == tenantId) {
                         if (ledgerForTenantMonth) {

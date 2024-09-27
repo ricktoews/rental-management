@@ -88,6 +88,10 @@ function LedgerEntry({ unit, ledgerMonth, ledgerYear, ledgerData = {}, updateLed
                         setPayments(updatedLedger.payments);
                         setLedgerId(updatedLedger.ledger_id);
                         setRefreshPayments(false);
+                    } else {
+                        setPayments([]);
+                        setLedgerId();
+                        setRefreshPayments(false);
                     }
                 });
         }
